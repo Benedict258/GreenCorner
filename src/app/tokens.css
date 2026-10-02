@@ -1,28 +1,35 @@
 /*
  * Design tokens: defined once, used everywhere.
  *
- * PLACEHOLDER VALUES. The build sandbox could not reach waste2light.com, so these are NOT the site's real
- * colors and fonts. Run `npm run extract-brand` on a machine with internet access, then replace the
- * values below. Nothing else in the app hard-codes a color or font.
+ * Taken from waste2light.com (npm run extract-brand, plus the site's :root variables in
+ * /assets/styles-*.css, checked 2026-10-02). The site names are noted next to each value.
+ * Fonts load from Google Fonts, the same weights the site requests.
+ * The warn and danger colors are the app's own: the site has no equivalents.
  */
-:root {
-  --font-body: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --font-heading: var(--font-body);
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Inter:wght@400;500;600&display=swap");
 
-  --color-bg: #f6f7f4;
-  --color-surface: #ffffff;
-  --color-text: #1b2420;
-  --color-muted: #5d6b64;
-  --color-border: #d9dfd9;
-  --color-primary: #1f7a45;
-  --color-primary-contrast: #ffffff;
-  --color-primary-soft: #e3f1e8;
+:root {
+  --font-body: "Inter", ui-sans-serif, system-ui, sans-serif;       /* --font-sans */
+  --font-heading: "Manrope", ui-sans-serif, system-ui, sans-serif;  /* --font-display */
+
+  --color-bg: #f7f8f3;              /* --background */
+  --color-surface: #ffffff;         /* --surface */
+  --color-text: #17231c;            /* --foreground */
+  --color-muted: #66736b;           /* --muted-foreground */
+  --color-border: #d8dad5;          /* --border: foreground at 14% on background, made opaque */
+  --color-primary: #0c5c2e;         /* --brand */
+  --color-primary-contrast: #ffffff;/* --brand-foreground */
+  --color-primary-soft: #e7f4eb;    /* --leaf #35a65a at 12% on white */
+  --color-forest: #0c4a23;          /* --forest */
+  --color-leaf: #35a65a;            /* --leaf / --energy */
+  --color-sun: #f6c453;             /* --sun */
   --color-warn: #8a5a00;
-  --color-warn-bg: #fff1d6;
+  --color-warn-bg: #fdf0d4;         /* --sun at 25% on white */
   --color-danger: #a02222;
   --color-danger-bg: #fde5e5;
-  --color-ok-bg: #e3f1e8;
+  --color-ok-bg: #e7f4eb;
 
   --radius: 8px;
+  --radius-pill: 999px;             /* buttons and nav links: rounded-full on the site */
   --space: 16px;
 }

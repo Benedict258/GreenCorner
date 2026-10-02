@@ -7,6 +7,7 @@ import { deleteQuoteAction, duplicateQuoteAction } from "../../actions";
 import ConfirmButton from "@/components/ConfirmButton";
 import PrintButton from "@/components/PrintButton";
 import { Badge } from "@/components/Badges";
+import { Logo } from "@/components/Logo";
 
 export const metadata = { title: "Quote" };
 
@@ -28,7 +29,7 @@ export default async function ViewQuote({ params }: { params: Promise<{ id: stri
         </div>
       </div>
       <section className="card">
-        <p className="print-only brand-mark">Waste2Light · Green Corner</p>
+        <p className="print-only brand-mark"><Logo suffix="Green Corner" /></p>
         <h2 className="print-only">{q.name}</h2>
         <p className="muted">Prices frozen on {formatLagos(q.updatedAt)} (Lagos time). All amounts in naira.</p>
         {q.notes && <p>{q.notes}</p>}

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { logout } from "../login/actions";
+import { Logo } from "@/components/Logo";
 
 const NAV = [
   ["/quotes", "Quotes"],
@@ -16,7 +17,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     <>
       <header className="site-header">
         <div className="inner">
-          <p className="brand-mark">Waste2Light · Green Corner</p>
+          <Link href="/quotes" className="brand-mark" aria-label="Green Corner quotes home"><Logo suffix="Green Corner" /></Link>
           <nav aria-label="Main">
             {NAV.map(([href, label]) => (
               <Link key={href} href={href}>{label}</Link>
