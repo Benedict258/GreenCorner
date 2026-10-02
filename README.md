@@ -47,9 +47,17 @@ TEST_DATABASE_URL=postgres://... npm test # also runs sync + quote integration t
 
 ## Deploy
 
-1. Create a Postgres database (Neon, Supabase). Run `npm run migrate` against it.
-2. Deploy this repo as its own app on its own subdomain (for example on Vercel). Set `DATABASE_URL`, `AUTH_SECRET`, `ADMIN_EMAIL`, `ADMIN_PASSWORD_HASH`, `SYNC_CONTACT`.
-3. In the GitHub repo add the secret `GCQ_DATABASE_URL` (same database) and optionally the variable `GCQ_SYNC_CONTACT`. The workflow `.github/workflows/sync.yml` only runs on the **default branch**, so merge before expecting scheduled runs.
+The production database is **Neon Postgres** (already migrated, and the sync workflow has run against it).
+
+1. Database: in Neon use the **direct** connection string (Connect → turn off *Connection pooling*; the host has no `-pooler`). The sync holds a Postgres session lock on one connection, which does not work through the pooler. Run `npm run migrate` against it; in PowerShell quote the string, it contains `&`:
+   `$env:DATABASE_URL='postgresql://...'; npm run migrate`
+2. Deploy this repo as its own app on its own subdomain (for example on Vercel: *Add New → Project*, import the GitHub repo, framework Next.js, no build settings to change). Set:
+   - `DATABASE_URL`: the same direct Neon string
+   - `AUTH_SECRET`: `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`
+   - `ADMIN_EMAIL`: the admin login
+   - `ADMIN_PASSWORD_HASH`: output of `npm run hash-password -- 'password'`, pasted as-is, no quotes
+   - `SYNC_CONTACT`: `https://waste2light.com`
+3. In the GitHub repo add the secret `GCQ_DATABASE_URL` (the same direct string) and optionally the variable `GCQ_SYNC_CONTACT`. The workflow `.github/workflows/sync.yml` only runs on the **default branch** (`main`).
 4. "Sync now" in the app runs in the background of the web request (`maxDuration` 300 s). Hosts that cap request time below that should use the workflow's manual **Run workflow** button with *force* instead.
 
 ## How the rules map to the PRD
@@ -64,7 +72,7 @@ TEST_DATABASE_URL=postgres://... npm test # also runs sync + quote integration t
 
 ## Capturing real data (run on a machine that can reach the sites)
 
-The build sandbox's network policy blocked `www.microscale.net` and `waste2light.com`, so these two steps have to be run on your own machine:
+Done on 2026-10-02: the captured pages are in `tests/fixtures/real/` and CI runs `tests/real-data.test.ts` on them. To refresh them:
 
 ```bash
 npm run capture-fixtures   # saves Microscale pages + robots.txt, /.well-known/ucp, /agents.md to tests/fixtures/real/
@@ -72,9 +80,7 @@ npm test                   # tests/real-data.test.ts now runs on the captured fi
 npm run extract-brand      # prints the real colors and fonts of waste2light.com; copy them into src/app/tokens.css
 ```
 
-`capture-fixtures` reports whether the feed contains a kit/bundle product and an unavailable product. Read the saved `agents.md` and `well-known-ucp.txt`: `products.json` stays the default unless that catalog endpoint is clearly better.
-
-Until these have run: the parser tests use hand-written Shopify-shaped samples, the colors and fonts in `src/app/tokens.css` are placeholders, and the logo is a text wordmark.
+Findings from the live feed: many newer variants have no SKU (matched by variant id instead), kits are single products with the contents in the description, and prices are plain decimal strings (two were `0.00` and become "no price"). The UCP endpoint in `well-known-ucp.txt` is built for cart and checkout; `products.json` stays the source because it reads the whole catalog in about 5 requests.
 
 ## Deviations from the PRD
 
