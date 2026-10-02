@@ -8,7 +8,6 @@ export interface LineInput {
   kind: "component" | "bundle";
   refId: number;
   quantity: number;
-  override?: Supplier | null;
   /** Drop the saved snapshot and price this line at today's prices. */
   reprice?: boolean;
 }
@@ -108,14 +107,13 @@ export async function saveQuote(id: number | null, name: string, notes: string, 
     if (!Number.isFinite(qty) || qty < 1 || qty > 100000) throw new Error("Quantities must be whole numbers from 1 to 100,000.");
     const prev = inp.lineId ? existing.find((e) => e.id === inp.lineId) : undefined;
     const sameRef = prev && (inp.kind === "component" ? prev.componentId === inp.refId : prev.bundleId === inp.refId);
-    const overrideUnchanged = !inp.override || inp.override === prev?.supplierUsed;
-    if (prev && sameRef && overrideUnchanged && !inp.reprice) {
+    if (prev && sameRef && !inp.reprice) {
       return { ...prev, quantity: qty, lineTotal: prev.unitPrice * qty };
     }
     if (inp.kind === "component") {
       const c = comps.get(inp.refId);
       if (!c) throw new Error("A component on this quote no longer exists.");
-      const p = priceComponent(c.listings, c.markupPct, qty, { ...opts, override: inp.override });
+      const p = priceComponent(c.listings, c.markupPct, qty, opts);
       return {
         componentId: c.id, bundleId: null, name: c.name, quantity: qty, supplierUsed: p.supplierUsed, supplierPrice: p.supplierPrice,
         markupPct: c.markupPct, unitPrice: p.unitPrice, lineTotal: p.lineTotal, detail: null, warnings: p.warnings,

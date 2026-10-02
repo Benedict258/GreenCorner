@@ -1,5 +1,12 @@
+/*
+ * DEFERRED: Hub360 support. NOT active in v1 (scope change: Microscale only).
+ * Why: product pages show no stock status or SKU, the price is plain text with no structured data,
+ * and the selectors could not be verified against real pages. Nothing imports this file.
+ * To bring it back, follow "Re-enabling Hub360" in the README. Verify every selector against captured pages first.
+ */
 import * as cheerio from "cheerio";
-import { parsePrice, userAgent, type Fetcher, type Observation, type Sleep, type SupplierSearchHit } from "./types";
+import type { ObserveContext, SupplierAdapter } from "../adapters";
+import { parsePrice, userAgent, type Fetcher, type Observation, type Sleep, type SupplierSearchHit } from "../types";
 
 export const HUB360_ORIGIN = "https://hub360.cc";
 export const HUB360_MIN_INTERVAL_MS = 1000;
@@ -167,3 +174,24 @@ export async function searchHub360(q: string, fetchFn: Fetcher = sharedHub360Fet
   if (!res.ok) throw new Error(`Hub360 search: HTTP ${res.status}`);
   return parseSearchResults(await res.text()).slice(0, 25);
 }
+
+/** Adapter for the sync runner. Not registered in v1. */
+export const hub360Adapter: SupplierAdapter = {
+  id: "hub360",
+  async observe(refs: string[], ctx: ObserveContext) {
+    // One request per second, one mapped page at a time. Never crawl beyond mapped items.
+    const fetchFn = makeRateLimited(ctx.fetchFn ?? fetch, ctx.sleep ?? defaultSleep);
+    const out = new Map<string, Observation | Error>();
+    for (const ref of refs) {
+      try {
+        out.set(ref, await fetchHub360Page(ref, fetchFn));
+      } catch (e) {
+        out.set(ref, e as Error);
+      }
+    }
+    return out;
+  },
+  search: (q, fetchFn) => searchHub360(q, fetchFn),
+  normalizeRef: hub360RefFromUrl,
+  invalidRefMessage: "That is not a Hub360 product URL (it should look like https://hub360.cc/shop/name-12345).",
+};

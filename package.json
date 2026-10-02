@@ -13,7 +13,8 @@
     "sync": "tsx scripts/sync.ts",
     "hash-password": "tsx scripts/hash-password.ts",
     "capture-fixtures": "tsx scripts/capture-fixtures.ts",
-    "extract-brand": "tsx scripts/extract-brand.ts"
+    "extract-brand": "tsx scripts/extract-brand.ts",
+    "test:deferred": "vitest run --config vitest.deferred.config.mts"
   },
   "engines": {
     "node": ">=20"

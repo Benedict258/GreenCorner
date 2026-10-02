@@ -2,7 +2,6 @@
 // Money is handled in kobo integers inside this file; callers see whole-naira numbers.
 
 export type Supplier = "microscale" | "hub360";
-export const SUPPLIERS: Supplier[] = ["microscale", "hub360"];
 export const SUPPLIER_LABEL: Record<Supplier, string> = {
   microscale: "Microscale",
   hub360: "Hub360",
@@ -28,7 +27,6 @@ export interface Warning {
 export interface PriceOptions {
   now: Date;
   staleAfterHours: number;
-  override?: Supplier | null;
 }
 
 export interface PricedComponent {
@@ -64,14 +62,13 @@ function perUnit(l: ListingPrice): number {
   return (l.price as number) / l.unitsPerListing;
 }
 
-/** Lowest in-stock per-unit price; falls back to the most recently synced listing. */
-export function chooseListing(listings: ListingPrice[], override?: Supplier | null): ListingPrice | null {
+/**
+ * Lowest in-stock per-unit price; falls back to the most recently synced listing.
+ * v1 has one active supplier, so this is that supplier's listing. Per-line supplier switching (FR-13) is deferred.
+ */
+export function chooseListing(listings: ListingPrice[]): ListingPrice | null {
   const priced = listings.filter((l) => l.price !== null && l.price > 0);
   if (priced.length === 0) return null;
-  if (override) {
-    const o = priced.find((l) => l.supplier === override);
-    if (o) return o;
-  }
   const inStock = priced.filter((l) => l.inStock);
   if (inStock.length > 0) {
     return inStock.reduce((a, b) => (perUnit(b) < perUnit(a) ? b : a));
@@ -90,7 +87,7 @@ export function priceComponent(
   quantity: number,
   opts: PriceOptions,
 ): PricedComponent {
-  const chosen = chooseListing(listings, opts.override);
+  const chosen = chooseListing(listings);
   const warnings: Warning[] = [];
   if (!chosen) {
     warnings.push({ code: "no_price", message: "No supplier price yet. This line is not in the total." });
@@ -102,7 +99,9 @@ export function priceComponent(
       code: "out_of_stock",
       message: anyInStock
         ? `${SUPPLIER_LABEL[chosen.supplier]} is out of stock.`
-        : "Out of stock at both suppliers. Priced from the most recent known price.",
+        : listings.length > 1
+          ? "Out of stock at every supplier. Priced from the most recent known price."
+          : `Out of stock at ${SUPPLIER_LABEL[chosen.supplier]}. Priced from the last known price.`,
     });
   }
   if (isStale(chosen, opts.now, opts.staleAfterHours)) {

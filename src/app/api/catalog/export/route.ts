@@ -2,6 +2,7 @@ import { requireAdmin } from "@/lib/auth";
 import { loadComponents } from "@/lib/catalog";
 import { priceComponent } from "@/lib/pricing";
 import { getSettings } from "@/lib/settings";
+import { ACTIVE_SUPPLIERS } from "@/lib/suppliers";
 
 const esc = (v: unknown) => {
   let s = v === null || v === undefined ? "" : String(v);
@@ -19,18 +20,17 @@ export async function GET() {
   const now = new Date();
   const header = [
     "id", "name", "category", "unit_label", "markup_pct", "active",
-    "microscale_price", "microscale_units", "microscale_in_stock", "microscale_synced_at",
-    "hub360_price", "hub360_units", "hub360_in_stock", "hub360_synced_at",
+    ...ACTIVE_SUPPLIERS.flatMap((s) => [`${s}_price`, `${s}_units`, `${s}_in_stock`, `${s}_synced_at`]),
     "supplier_used", "unit_price_ngn",
   ];
   const rows = comps.map((c) => {
-    const m = c.listings.find((l) => l.supplier === "microscale");
-    const h = c.listings.find((l) => l.supplier === "hub360");
     const p = priceComponent(c.listings, c.markupPct, 1, { now, staleAfterHours: settings.staleAfterHours });
     return [
       c.id, c.name, c.category, c.unitLabel, c.markupPct, c.active,
-      m?.price, m?.unitsPerListing, m?.inStock, m?.lastSyncedAt,
-      h?.price, h?.unitsPerListing, h?.inStock, h?.lastSyncedAt,
+      ...ACTIVE_SUPPLIERS.flatMap((s) => {
+        const l = c.listings.find((x) => x.supplier === s);
+        return [l?.price, l?.unitsPerListing, l?.inStock, l?.lastSyncedAt];
+      }),
       p.supplierUsed, p.supplierUsed ? p.unitPrice : "",
     ];
   });

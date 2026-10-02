@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { query } from "@/lib/db";
 import { formatLagos } from "@/lib/time";
-import { formatNaira, SUPPLIER_LABEL, SUPPLIERS } from "@/lib/pricing";
+import { formatNaira, SUPPLIER_LABEL } from "@/lib/pricing";
+import { ACTIVE_SUPPLIERS } from "@/lib/suppliers";
 import { Badge } from "@/components/Badges";
 import SyncControls from "./SyncControls";
 import { decideHeld } from "./actions";
@@ -12,14 +13,14 @@ const kindFor = (s: string) => (s === "success" ? "ok" : s === "running" || s ==
 
 export default async function SyncPage() {
   const [runs, held, problems, running] = await Promise.all([
-    query("select * from sync_runs order by started_at desc limit 30"),
+    query("select * from sync_runs where supplier = any($1::text[]) order by started_at desc limit 30", [ACTIVE_SUPPLIERS]),
     query(
       `select h.*, l.supplier, l.component_id, c.name from held_changes h join supplier_listings l on l.id = h.listing_id
-       join components c on c.id = l.component_id where h.decision = 'pending' order by h.detected_at`),
+       join components c on c.id = l.component_id where h.decision = 'pending' and l.supplier = any($1::text[]) order by h.detected_at`, [ACTIVE_SUPPLIERS]),
     query(
       `select l.id, l.supplier, l.component_id, l.supplier_ref, l.last_error, c.name from supplier_listings l join components c on c.id = l.component_id
-       where l.status = 'error' order by c.name`),
-    query("select supplier from sync_runs where status = 'running' and started_at > now() - interval '30 minutes'"),
+       where l.status = 'error' and l.supplier = any($1::text[]) order by c.name`, [ACTIVE_SUPPLIERS]),
+    query("select supplier from sync_runs where status = 'running' and started_at > now() - interval '30 minutes' and supplier = any($1::text[])", [ACTIVE_SUPPLIERS]),
   ]);
   const runningSet = new Set(running.map((r) => r.supplier));
   return (
@@ -27,7 +28,7 @@ export default async function SyncPage() {
       <h1>Sync</h1>
 
       <div className="card-grid" style={{ display: "grid", gap: 16, gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))" }}>
-        {SUPPLIERS.map((s) => {
+        {ACTIVE_SUPPLIERS.map((s) => {
           const last = runs.find((r) => r.supplier === s && !r.component_id && r.status !== "running");
           return (
             <section className="card" key={s}>

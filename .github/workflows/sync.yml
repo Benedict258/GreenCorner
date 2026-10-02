@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
     inputs:
       force:
-        description: "Sync both suppliers now, ignoring the schedule"
+        description: "Sync now (Microscale), ignoring the schedule"
         type: boolean
         default: false
 

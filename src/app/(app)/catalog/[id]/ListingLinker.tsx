@@ -47,7 +47,7 @@ export default function ListingLinker({ componentId, supplier, current }: { comp
     <div className="stack">
       <div className="row">
         <label>Search or paste a product URL
-          <input value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); search(); } }} placeholder={supplier === "hub360" ? "arduino uno, or https://hub360.cc/shop/...-18006" : "arduino uno, or https://www.microscale.net/products/..."} />
+          <input value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); search(); } }} placeholder="arduino uno, or https://www.microscale.net/products/..." />
         </label>
         <label style={{ flex: "0 0 140px" }}>Units per listing
           <input type="number" min={1} value={units} onChange={(e) => setUnits(Number(e.target.value))} />

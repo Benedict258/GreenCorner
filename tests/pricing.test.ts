@@ -35,33 +35,34 @@ describe("priceComponent", () => {
     expect(box.lineTotal).toBe(43120);
     expect(uno.lineTotal + box.lineTotal).toBe(98120);
   });
-  it("uses the lowest in-stock price per unit, not per listing", () => {
-    const m = L({ supplier: "microscale", price: 1000 });
-    const h = L({ supplier: "hub360", price: 1500, unitsPerListing: 5 }); // 300 per unit
-    expect(chooseListing([m, h])?.supplier).toBe("hub360");
+  it("prices from the Microscale listing: price / units x (1 + markup)", () => {
+    const r = priceComponent([L({ supplier: "microscale", price: 29360, unitsPerListing: 1 })], 10, 2, opts);
+    expect(r.supplierUsed).toBe("microscale");
+    expect(r.unitPrice).toBe(32296);
+    expect(r.lineTotal).toBe(64592);
   });
-  it("skips an out-of-stock cheaper supplier", () => {
-    const m = L({ supplier: "microscale", price: 500, inStock: false });
-    const h = L({ supplier: "hub360", price: 900 });
-    const r = priceComponent([m, h], 10, 1, opts);
-    expect(r.supplierUsed).toBe("hub360");
-    expect(r.warnings).toHaveLength(0);
+  it("divides a pack before applying markup (units_per_listing > 1)", () => {
+    const r = priceComponent([L({ supplier: "microscale", price: 1500, unitsPerListing: 5 })], 10, 12, opts);
+    expect(r.unitPrice).toBe(330); // 1500 / 5 = 300, +10%
+    expect(r.lineTotal).toBe(3960);
+    expect(priceComponent([L({ supplier: "microscale", price: 1000, unitsPerListing: 3 })], 10, 1, opts).unitPrice).toBe(367); // 366.67 rounds up
+    expect(priceComponent([L({ supplier: "microscale", price: 1000, unitsPerListing: 3 })], 0, 1, opts).unitPrice).toBe(333); // 333.33 rounds down
   });
-  it("honours a per-line supplier override", () => {
-    const m = L({ supplier: "microscale", price: 500 });
-    const h = L({ supplier: "hub360", price: 900 });
-    expect(priceComponent([m, h], 10, 1, { ...opts, override: "hub360" }).supplierUsed).toBe("hub360");
+  it("uses the component's own markup, including a non-default one", () => {
+    expect(priceComponent([L({ supplier: "microscale", price: 10000 })], 25, 1, opts).unitPrice).toBe(12500);
   });
-  it("uses the only supplier that lists the item", () => {
-    expect(priceComponent([L({ supplier: "hub360", price: 700 })], 10, 1, opts).supplierUsed).toBe("hub360");
-  });
-  it("keeps an out-of-stock-everywhere line with a warning and the latest price", () => {
-    const m = L({ supplier: "microscale", price: 500, inStock: false, lastSyncedAt: "2026-10-02T06:00:00Z" });
-    const h = L({ supplier: "hub360", price: 900, inStock: false, lastSyncedAt: "2026-10-02T09:00:00Z" });
-    const r = priceComponent([m, h], 10, 2, opts);
-    expect(r.supplierUsed).toBe("hub360");
-    expect(r.lineTotal).toBe(1980);
+  it("keeps an out-of-stock Microscale item with a warning and its last known price", () => {
+    const r = priceComponent([L({ supplier: "microscale", price: 5000, inStock: false })], 10, 2, opts);
+    expect(r.unitPrice).toBe(5500);
+    expect(r.lineTotal).toBe(11000);
     expect(r.warnings.map((w) => w.code)).toEqual(["out_of_stock"]);
+    expect(r.warnings[0].message).toMatch(/Microscale/);
+  });
+  it("still picks the lowest in-stock per-unit price if a second supplier is ever enabled", () => {
+    const m = L({ supplier: "microscale", price: 1000 });
+    const h = L({ supplier: "hub360", price: 1500, unitsPerListing: 5 });
+    expect(chooseListing([m, h])?.supplier).toBe("hub360");
+    expect(chooseListing([L({ supplier: "microscale", price: 500, inStock: false }), L({ supplier: "hub360", price: 900 })])?.supplier).toBe("hub360");
   });
   it("warns on stale and held prices", () => {
     const old = L({ supplier: "microscale", lastSyncedAt: "2026-09-29T00:00:00Z" });

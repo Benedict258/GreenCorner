@@ -4,7 +4,8 @@ import { loadCategories, loadComponent } from "@/lib/catalog";
 import { getSettings } from "@/lib/settings";
 import { formatLagos } from "@/lib/time";
 import { query } from "@/lib/db";
-import { formatNaira, SUPPLIER_LABEL, SUPPLIERS } from "@/lib/pricing";
+import { formatNaira, SUPPLIER_LABEL } from "@/lib/pricing";
+import { ACTIVE_SUPPLIERS } from "@/lib/suppliers";
 import { ListingBadges, Badge } from "@/components/Badges";
 import ComponentForm from "../ComponentForm";
 import ListingLinker from "./ListingLinker";
@@ -41,8 +42,8 @@ export default async function ComponentPage({ params, searchParams }: { params: 
       <datalist id="cats">{cats.map((x) => <option key={x} value={x} />)}</datalist>
       <ComponentForm c={c} action={updateComponent.bind(null, c.id)} submitLabel="Save changes" />
 
-      <h2>Supplier listings</h2>
-      {SUPPLIERS.map((s) => {
+      <h2>Supplier listing</h2>
+      {ACTIVE_SUPPLIERS.map((s) => {
         const l = c.listings.find((x) => x.supplier === s);
         return (
           <section className="card" key={s}>

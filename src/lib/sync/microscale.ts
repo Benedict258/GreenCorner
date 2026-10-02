@@ -1,22 +1,31 @@
+import type { SupplierAdapter } from "./adapters";
 import { parsePrice, userAgent, type Fetcher, type Observation, type SupplierSearchHit } from "./types";
 
 export const MICROSCALE_ORIGIN = "https://www.microscale.net";
+const FEED_CACHE_MS = 10 * 60_000;
 
 interface ShopifyVariant {
+  id?: number;
   sku?: string | null;
   title?: string;
   price?: string | number;
   available?: boolean;
 }
 interface ShopifyProduct {
+  id?: number;
   handle?: string;
   title?: string;
   variants?: ShopifyVariant[];
 }
 
-/** Ref format: "<handle>#<sku>", or just "<handle>" for the first variant. */
-export function makeMicroscaleRef(handle: string, sku?: string | null): string {
-  return sku ? `${handle}#${sku}` : handle;
+/**
+ * Ref format: "<handle>#<sku>". A variant with no SKU gets "<handle>#id:<variantId>".
+ * A bare "<handle>" means the product's first variant.
+ */
+export function makeMicroscaleRef(handle: string, sku?: string | null, variantId?: number): string {
+  if (sku) return `${handle}#${sku}`;
+  if (variantId !== undefined) return `${handle}#id:${variantId}`;
+  return handle;
 }
 
 export function splitMicroscaleRef(ref: string): { handle: string; sku: string | null } {
@@ -24,43 +33,56 @@ export function splitMicroscaleRef(ref: string): { handle: string; sku: string |
   return i === -1 ? { handle: ref, sku: null } : { handle: ref.slice(0, i), sku: ref.slice(i + 1) || null };
 }
 
-/** One observation per variant. Variant-less SKUs fall back to the handle-only ref for the first variant. */
+/**
+ * One observation per variant, plus a handle-only ref for the first variant.
+ * A ref that appears more than once in the feed is ambiguous, so its price is set to null:
+ * the safeguards then refuse to write it instead of guessing which variant was meant.
+ */
 export function parseProductsJson(json: unknown): Observation[] {
   const products = (json as { products?: ShopifyProduct[] })?.products;
   if (!Array.isArray(products)) throw new Error("Microscale feed: missing products array");
   const out: Observation[] = [];
   for (const p of products) {
     if (!p.handle || !Array.isArray(p.variants)) continue;
-    p.variants.forEach((v, i) => {
-      const multi = (p.variants as ShopifyVariant[]).length > 1;
+    const variants = p.variants;
+    variants.forEach((v, i) => {
+      const multi = variants.length > 1;
       const title = multi && v.title && v.title !== "Default Title" ? `${p.title} (${v.title})` : String(p.title ?? p.handle);
       const inStock = typeof v.available === "boolean" ? v.available : null;
       const price = parsePrice(v.price);
-      if (v.sku) out.push({ ref: makeMicroscaleRef(p.handle as string, v.sku), title, price, inStock });
+      out.push({ ref: makeMicroscaleRef(p.handle as string, v.sku, v.id), title, price, inStock });
       if (i === 0) out.push({ ref: makeMicroscaleRef(p.handle as string), title, price, inStock });
     });
   }
-  return out;
+  const seen = new Map<string, number>();
+  for (const o of out) seen.set(o.ref, (seen.get(o.ref) ?? 0) + 1);
+  return out.map((o) => ((seen.get(o.ref) ?? 0) > 1 ? { ...o, price: null } : o));
 }
 
-/** Pages through /products.json until a page comes back empty. */
+/** Pages through /products.json until a page comes back empty. One pass, no per-product requests. */
 export async function fetchMicroscaleFeed(
   fetchFn: Fetcher = fetch,
   opts: { maxPages?: number; onPage?: (page: number, count: number) => void } = {},
 ): Promise<Observation[]> {
   const max = opts.maxPages ?? 100;
   const all: Observation[] = [];
+  let prevFirstId: unknown = null;
   for (let page = 1; page <= max; page++) {
     const res = await fetchFn(`${MICROSCALE_ORIGIN}/products.json?limit=250&page=${page}`, {
       headers: { "user-agent": userAgent(), accept: "application/json" },
     });
     if (!res.ok) throw new Error(`Microscale feed page ${page}: HTTP ${res.status}`);
     const json = await res.json();
-    const products = (json as { products?: unknown[] }).products;
+    const products = (json as { products?: ShopifyProduct[] }).products;
     if (!Array.isArray(products)) throw new Error(`Microscale feed page ${page}: missing products array`);
     if (products.length === 0) return all;
-    const obs = parseProductsJson(json);
-    all.push(...obs);
+    // If the shop ignored the page parameter we would loop on the same page; stop loudly instead.
+    const firstId = products[0].id ?? products[0].handle;
+    if (page > 1 && firstId !== undefined && firstId === prevFirstId) {
+      throw new Error(`Microscale feed page ${page} repeats page ${page - 1}; refusing to continue`);
+    }
+    prevFirstId = firstId;
+    all.push(...parseProductsJson(json));
     opts.onPage?.(page, products.length);
   }
   throw new Error(`Microscale feed: still returning products after ${max} pages`);
@@ -80,16 +102,27 @@ export function microscaleHandleFromUrl(input: string): string | null {
 
 let feedCache: { at: number; obs: Observation[] } | null = null;
 
-/** In-app search reads the public feed (cached 10 min) so it never needs a separate endpoint. */
+async function cachedFeed(fetchFn: Fetcher, maxAgeMs: number, onPage?: (p: number, n: number) => void): Promise<Observation[]> {
+  if (feedCache && Date.now() - feedCache.at < maxAgeMs) return feedCache.obs;
+  const obs = await fetchMicroscaleFeed(fetchFn, { onPage });
+  feedCache = { at: Date.now(), obs };
+  return obs;
+}
+
+export function clearMicroscaleCache(): void {
+  feedCache = null;
+}
+
+/** In-app search reads the same public feed (cached 10 min); pasting a product URL lists that product's variants. */
 export async function searchMicroscale(q: string, fetchFn: Fetcher = fetch): Promise<SupplierSearchHit[]> {
   const handle = microscaleHandleFromUrl(q);
-  if (/^https?:\/\//i.test(q.trim()) && !handle) throw new Error("That is not a Microscale product URL (it should look like https://www.microscale.net/products/name)");
-  if (!feedCache || Date.now() - feedCache.at > 600_000) {
-    feedCache = { at: Date.now(), obs: await fetchMicroscaleFeed(fetchFn) };
+  if (/^https?:\/\//i.test(q.trim()) && !handle) {
+    throw new Error("That is not a Microscale product URL (it should look like https://www.microscale.net/products/name)");
   }
+  const feed = await cachedFeed(fetchFn, FEED_CACHE_MS);
   const needle = q.trim().toLowerCase();
-  const hits = feedCache.obs.filter((o) => {
-    if (!o.ref.includes("#")) return false; // list each SKU once; handle-only refs duplicate the first variant
+  const hits = feed.filter((o) => {
+    if (!o.ref.includes("#")) return false; // list each variant once; handle-only refs duplicate the first variant
     if (handle) return o.ref.startsWith(`${handle}#`);
     return o.title.toLowerCase().includes(needle) || o.ref.toLowerCase().includes(needle);
   });
@@ -102,3 +135,23 @@ export async function searchMicroscale(q: string, fetchFn: Fetcher = fetch): Pro
     url: `${MICROSCALE_ORIGIN}/products/${o.ref.split("#")[0]}`,
   }));
 }
+
+export const microscaleAdapter: SupplierAdapter = {
+  id: "microscale",
+  async observe(refs, ctx) {
+    const feed = await cachedFeed(ctx.fetchFn ?? fetch, ctx.allowCache ? FEED_CACHE_MS : 0, (p, n) => ctx.log(`Feed page ${p}: ${n} products.`));
+    const byRef = new Map(feed.map((o) => [o.ref, o]));
+    const out = new Map<string, Observation | Error>();
+    for (const ref of refs) {
+      const o = byRef.get(ref);
+      if (o) out.set(ref, o);
+    }
+    return out;
+  },
+  search: searchMicroscale,
+  normalizeRef(input) {
+    const ref = input.trim();
+    return /^[a-z0-9][a-z0-9-_.]*(#.+)?$/i.test(ref) ? ref : null;
+  },
+  invalidRefMessage: "That is not a valid Microscale listing. Pick one from the search results.",
+};

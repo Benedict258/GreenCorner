@@ -3,6 +3,7 @@ import Link from "next/link";
 import { useMemo, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { formatNaira, priceBundle, priceComponent, SUPPLIER_LABEL, type ListingPrice, type Supplier, type Warning } from "@/lib/pricing";
+import { ACTIVE_SUPPLIERS } from "@/lib/suppliers";
 import { ListingBadges } from "@/components/Badges";
 import { saveQuoteAction } from "./actions";
 
@@ -31,7 +32,6 @@ interface Line {
   kind: "component" | "bundle";
   refId: number;
   quantity: number;
-  override: Supplier | null;
   reprice: boolean;
   frozen: InitialLine | null;
 }
@@ -44,7 +44,7 @@ export default function QuoteBuilder({ catalog, initial }: { catalog: BuilderCat
   const [name, setName] = useState(initial.name);
   const [notes, setNotes] = useState(initial.notes);
   const [lines, setLines] = useState<Line[]>(() =>
-    initial.lines.map((l) => ({ key: newKey(), kind: l.kind, refId: l.refId, quantity: l.quantity, override: null, reprice: false, frozen: l })),
+    initial.lines.map((l) => ({ key: newKey(), kind: l.kind, refId: l.refId, quantity: l.quantity, reprice: false, frozen: l })),
   );
   const [error, setError] = useState<string | null>(null);
   const [dirty, setDirty] = useState(false);
@@ -60,16 +60,16 @@ export default function QuoteBuilder({ catalog, initial }: { catalog: BuilderCat
     change((ls) => {
       const hit = ls.find((l) => l.kind === kind && l.refId === refId);
       if (hit) return ls.map((l) => (l === hit ? { ...l, quantity: l.quantity + 1 } : l));
-      return [...ls, { key: newKey(), kind, refId, quantity: 1, override: null, reprice: false, frozen: null }];
+      return [...ls, { key: newKey(), kind, refId, quantity: 1, reprice: false, frozen: null }];
     });
   }
   const patch = (key: string, p: Partial<Line>) => change((ls) => ls.map((l) => (l.key === key ? { ...l, ...p } : l)));
 
   const rows = lines.map((l) => {
-    const frozenActive = !!l.frozen && !l.reprice && (!l.override || l.override === l.frozen.supplierUsed);
+    const frozenActive = !!l.frozen && !l.reprice;
     if (l.kind === "component") {
       const c = comps.get(l.refId);
-      const live = c ? priceComponent(c.listings, c.markupPct, l.quantity, { ...opts, override: l.override }) : null;
+      const live = c ? priceComponent(c.listings, c.markupPct, l.quantity, opts) : null;
       if (frozenActive && l.frozen) {
         return { l, name: l.frozen.name, c, supplierUsed: l.frozen.supplierUsed, markup: l.frozen.markupPct, unit: l.frozen.unitPrice, total: l.frozen.unitPrice * l.quantity, warnings: l.frozen.warnings, breakdown: null, frozen: true, gone: !c };
       }
@@ -94,7 +94,7 @@ export default function QuoteBuilder({ catalog, initial }: { catalog: BuilderCat
     start(async () => {
       const res = await saveQuoteAction(
         initial.id, name, notes,
-        lines.map((l) => ({ lineId: l.frozen?.lineId ?? null, kind: l.kind, refId: l.refId, quantity: l.quantity, override: l.override, reprice: l.reprice })),
+        lines.map((l) => ({ lineId: l.frozen?.lineId ?? null, kind: l.kind, refId: l.refId, quantity: l.quantity, reprice: l.reprice })),
       );
       if ("error" in res) return setError(res.error);
       setDirty(false);
@@ -128,12 +128,12 @@ export default function QuoteBuilder({ catalog, initial }: { catalog: BuilderCat
         <table>
           <thead>
             <tr>
-              <th>Item</th><th className="num">Qty</th><th>Microscale</th><th>Hub360</th><th>Supplier used</th>
+              <th>Item</th><th className="num">Qty</th>{ACTIVE_SUPPLIERS.map((s) => <th key={s}>{SUPPLIER_LABEL[s]} price</th>)}
               <th className="num">Markup</th><th className="num">Unit price</th><th className="num">Line total</th><th></th>
             </tr>
           </thead>
           <tbody>
-            {rows.length === 0 && <tr><td colSpan={9} className="muted">No items yet. Search above to add components or bundles.</td></tr>}
+            {rows.length === 0 && <tr><td colSpan={6 + ACTIVE_SUPPLIERS.length} className="muted">No items yet. Search above to add components or bundles.</td></tr>}
             {rows.map((r) => (
               <tr key={r.l.key}>
                 <td>
@@ -149,7 +149,7 @@ export default function QuoteBuilder({ catalog, initial }: { catalog: BuilderCat
                   )}
                 </td>
                 <td className="num"><input className="qty" type="number" min={1} max={100000} value={r.l.quantity} aria-label={`Quantity for ${r.name}`} onChange={(e) => patch(r.l.key, { quantity: Math.max(1, Math.floor(Number(e.target.value)) || 1) })} /></td>
-                {(["microscale", "hub360"] as Supplier[]).map((s) => {
+                {ACTIVE_SUPPLIERS.map((s) => {
                   const l = r.c?.listings.find((x) => x.supplier === s);
                   return (
                     <td key={s} className="price-cell">
@@ -163,14 +163,6 @@ export default function QuoteBuilder({ catalog, initial }: { catalog: BuilderCat
                     </td>
                   );
                 })}
-                <td>
-                  {r.l.kind === "component" && r.c ? (
-                    <select aria-label={`Supplier for ${r.name}`} value={r.l.override ?? "auto"} onChange={(e) => patch(r.l.key, { override: e.target.value === "auto" ? null : (e.target.value as Supplier) })}>
-                      <option value="auto">Auto{r.supplierUsed ? ` (${SUPPLIER_LABEL[r.supplierUsed]})` : ""}</option>
-                      {r.c.listings.filter((l) => l.price !== null).map((l) => <option key={l.supplier} value={l.supplier}>{SUPPLIER_LABEL[l.supplier]}</option>)}
-                    </select>
-                  ) : <span className="muted">{r.l.kind === "bundle" ? "Per component" : "-"}</span>}
-                </td>
                 <td className="num">{r.markup !== null ? `${r.markup}%` : "-"}</td>
                 <td className="num">{formatNaira(r.unit)}</td>
                 <td className="num"><strong>{formatNaira(r.total)}</strong></td>

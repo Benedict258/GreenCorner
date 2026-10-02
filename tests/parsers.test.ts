@@ -1,7 +1,6 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { fetchMicroscaleFeed, microscaleHandleFromUrl, parseProductsJson, splitMicroscaleRef } from "../src/lib/sync/microscale";
-import { hub360ProductId, hub360RefFromUrl, makeRateLimited, parseProductPage, parseSearchResults } from "../src/lib/sync/hub360";
 import { decide } from "../src/lib/sync/safeguards";
 import { latestDueSlot } from "../src/lib/time";
 import { parsePrice } from "../src/lib/sync/types";
@@ -31,6 +30,29 @@ describe("Microscale parser", () => {
     expect(microscaleHandleFromUrl("https://www.microscale.net/products/arduino-uno-r3?variant=1")).toBe("arduino-uno-r3");
     expect(microscaleHandleFromUrl("https://example.com/products/x")).toBeNull();
   });
+  it("gives SKU-less variants a variant-id ref and keeps duplicate refs out of pricing", () => {
+    const o = parseProductsJson({ products: [
+      { id: 9, handle: "kit", title: "Kit", variants: [{ id: 91, sku: "", title: "A", price: "100.00", available: true }, { id: 92, sku: "", title: "B", price: "200.00", available: true }] },
+      { id: 10, handle: "dup", title: "Dup", variants: [{ id: 101, sku: "X", price: "1.00", available: true }, { id: 102, sku: "X", price: "2.00", available: true }] },
+    ] });
+    expect(o.find((x) => x.ref === "kit#id:92")?.price).toBe(200);
+    expect(o.filter((x) => x.ref === "dup#X").every((x) => x.price === null)).toBe(true);
+  });
+  it("stops loudly if the shop ignores the page parameter", async () => {
+    const page = JSON.parse(fx("microscale-products.json"));
+    const fake = (async () => ({ ok: true, status: 200, json: async () => page })) as unknown as typeof fetch;
+    await expect(fetchMicroscaleFeed(fake)).rejects.toThrow(/repeats page/);
+  });
+  it("sends a User-Agent that identifies Waste2Light and makes one request per page", async () => {
+    const seen: { url: string; ua: string }[] = [];
+    const pages = [JSON.parse(fx("microscale-products.json")), { products: [] }];
+    let i = 0;
+    const fake = (async (u: string, init?: RequestInit) => { seen.push({ url: u, ua: String((init?.headers as Record<string, string>)["user-agent"]) }); return { ok: true, status: 200, json: async () => pages[i++] }; }) as unknown as typeof fetch;
+    await fetchMicroscaleFeed(fake);
+    expect(seen).toHaveLength(2);
+    expect(seen[0].url).toBe("https://www.microscale.net/products.json?limit=250&page=1");
+    expect(seen.every((x) => /Waste2Light/.test(x.ua))).toBe(true);
+  });
   it("pages until an empty page", async () => {
     const pages = [JSON.parse(fx("microscale-products.json")), { products: [] }];
     let i = 0;
@@ -38,39 +60,6 @@ describe("Microscale parser", () => {
     const all = await fetchMicroscaleFeed(fake);
     expect(i).toBe(2);
     expect(all.length).toBeGreaterThan(3);
-  });
-});
-
-describe("Hub360 parser", () => {
-  const ref = "https://hub360.cc/shop/arduino-uno-r3-18006";
-  it("reads JSON-LD price and stock", () => {
-    expect(parseProductPage(fx("hub360-product-jsonld.html"), ref)).toMatchObject({ price: 11900, inStock: true, title: "Arduino Uno R3" });
-  });
-  it("falls back to the printed price and the stock message", () => {
-    expect(parseProductPage(fx("hub360-product-printed.html"), ref)).toMatchObject({ price: 1250, inStock: false });
-  });
-  it("returns a null price when the page has none", () => {
-    expect(parseProductPage(fx("hub360-product-noprice.html"), ref).price).toBeNull();
-  });
-  it("parses search cards and ignores category links", () => {
-    const hits = parseSearchResults(fx("hub360-search.html"));
-    expect(hits.map((h) => h.ref)).toEqual(["https://hub360.cc/shop/arduino-uno-r3-18006", "https://hub360.cc/shop/arduino-nano-18010"]);
-    expect(hits[0]).toMatchObject({ title: "Arduino Uno R3", price: 11900 });
-  });
-  it("accepts only Hub360 product URLs", () => {
-    expect(hub360RefFromUrl("https://hub360.cc/shop/arduino-uno-r3-18006?x=1")).toBe(ref);
-    expect(hub360RefFromUrl("https://hub360.cc/shop/category/boards-3")).toBeNull();
-    expect(hub360RefFromUrl("https://evil.example/shop/a-1")).toBeNull();
-    expect(hub360ProductId(ref)).toBe("18006");
-  });
-  it("never sends more than one request per second", async () => {
-    let t = 0;
-    const times: number[] = [];
-    const fake = (async () => { times.push(t); return {} as Response; }) as unknown as typeof fetch;
-    const f = makeRateLimited(fake, async (ms) => { t += ms; }, 1000, () => t);
-    await Promise.all([f("a"), f("b"), f("c")]);
-    expect(times[1] - times[0]).toBeGreaterThanOrEqual(1000);
-    expect(times[2] - times[1]).toBeGreaterThanOrEqual(1000);
   });
 });
 

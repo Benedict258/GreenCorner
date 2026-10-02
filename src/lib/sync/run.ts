@@ -3,8 +3,8 @@ import { getPool } from "../db";
 import { getSettings, type AppSettings } from "../settings";
 import type { Supplier } from "../pricing";
 import { decide } from "./safeguards";
-import { fetchMicroscaleFeed } from "./microscale";
-import { defaultSleep, fetchHub360Page, makeRateLimited } from "./hub360";
+import { ACTIVE_SUPPLIERS } from "../suppliers";
+import { ADAPTERS } from "./adapters";
 import type { Fetcher, Observation, Sleep } from "./types";
 
 export interface RunOptions {
@@ -13,6 +13,8 @@ export interface RunOptions {
   componentId?: number;
   fetchFn?: Fetcher;
   sleep?: Sleep;
+  /** Accept a feed fetched in the last few minutes (set after linking a listing; scheduled runs never do). */
+  allowCache?: boolean;
   /** Pre-created run row (the web app creates it first so the page can show "running"). */
   runId?: number;
 }
@@ -65,6 +67,13 @@ export async function runSync(opts: RunOptions): Promise<RunResult> {
       return { runId, status: "skipped", ...counts };
     }
 
+    const adapter = ADAPTERS[supplier];
+    if (!adapter || !ACTIVE_SUPPLIERS.includes(supplier)) {
+      log(`Supplier ${supplier} is not enabled in this version. Nothing was synced.`);
+      await finish(client, runId, "failed", counts, lines);
+      return { runId, status: "failed", ...counts };
+    }
+
     const settings = await getSettings();
     const params: unknown[] = [supplier];
     let sql = `select l.id, l.component_id, l.supplier, l.supplier_ref, l.price_ngn, l.in_stock
@@ -78,10 +87,12 @@ export async function runSync(opts: RunOptions): Promise<RunResult> {
     log(`${supplier}: ${listings.length} mapped listing(s) to sync.`);
 
     if (listings.length > 0) {
-      if (supplier === "microscale") {
-        await syncMicroscale(client, listings, settings, opts, counts, log);
-      } else {
-        await syncHub360(client, listings, settings, opts, counts, log);
+      const results = await adapter.observe(listings.map((l) => l.supplier_ref), { fetchFn: opts.fetchFn, sleep: opts.sleep, log, allowCache: opts.allowCache });
+      for (const l of listings) {
+        const r = results.get(l.supplier_ref);
+        if (!r) await recordError(client, l, "Not found at the supplier. Re-link this listing.", counts, log);
+        else if (r instanceof Error) await recordError(client, l, r.message, counts, log);
+        else await applyObservation(client, l, r, settings, counts, log);
       }
     }
 
@@ -111,32 +122,6 @@ async function finish(client: PoolClient, runId: number, status: string, c: { up
     `update sync_runs set status = $2, finished_at = now(), updated_count = $3, unchanged_count = $4, failed_count = $5, log = $6 where id = $1`,
     [runId, status, c.updated, c.unchanged, c.failed, lines.join("\n")],
   );
-}
-
-async function syncMicroscale(client: PoolClient, listings: ListingRow[], settings: AppSettings, opts: RunOptions, counts: Counts, log: Log) {
-  const feed = await fetchMicroscaleFeed(opts.fetchFn ?? fetch, { onPage: (p, n) => log(`Feed page ${p}: ${n} products.`) });
-  const byRef = new Map(feed.map((o) => [o.ref, o]));
-  for (const l of listings) {
-    const obs = byRef.get(l.supplier_ref);
-    if (!obs) {
-      await recordError(client, l, "Not found in the Microscale feed. Re-link this listing.", counts, log);
-      continue;
-    }
-    await applyObservation(client, l, obs, settings, counts, log);
-  }
-}
-
-async function syncHub360(client: PoolClient, listings: ListingRow[], settings: AppSettings, opts: RunOptions, counts: Counts, log: Log) {
-  // One request per second, one mapped page at a time. Never crawl beyond mapped items.
-  const fetchFn = makeRateLimited(opts.fetchFn ?? fetch, opts.sleep ?? defaultSleep);
-  for (const l of listings) {
-    try {
-      const obs = await fetchHub360Page(l.supplier_ref, fetchFn);
-      await applyObservation(client, l, obs, settings, counts, log);
-    } catch (e) {
-      await recordError(client, l, (e as Error).message, counts, log);
-    }
-  }
 }
 
 type Counts = { updated: number; unchanged: number; failed: number };

@@ -1,18 +1,20 @@
 // Sync entry point. Used by GitHub Actions and by hand.
 //   npm run sync -- --scheduled            run only if a configured sync time is due (hourly cron safe)
 //   npm run sync -- --supplier=microscale  force one supplier now
-//   npm run sync                           force both suppliers now
+//   npm run sync                           force every enabled supplier now (Microscale only in v1)
 import { closePool, query } from "../src/lib/db";
 import { getSettings } from "../src/lib/settings";
 import { latestDueSlot } from "../src/lib/time";
 import { runSync } from "../src/lib/sync/run";
 import type { Supplier } from "../src/lib/pricing";
+import { ACTIVE_SUPPLIERS } from "../src/lib/suppliers";
 
 async function main() {
   const args = process.argv.slice(2);
   const scheduled = args.includes("--scheduled");
   const only = args.find((a) => a.startsWith("--supplier="))?.split("=")[1] as Supplier | undefined;
-  const suppliers: Supplier[] = only ? [only] : ["microscale", "hub360"];
+  if (only && !ACTIVE_SUPPLIERS.includes(only)) throw new Error(`Supplier ${only} is not enabled.`);
+  const suppliers: Supplier[] = only ? [only] : ACTIVE_SUPPLIERS;
 
   if (scheduled) {
     const settings = await getSettings();

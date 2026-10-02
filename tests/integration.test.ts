@@ -37,8 +37,18 @@ d("sync + quotes against Postgres", () => {
     await db.query("insert into supplier_listings (component_id, supplier, supplier_ref) values ($1, 'microscale', 'arduino-uno-r3#UNO')", [compId]);
   });
 
-  const sync = () => run.runSync({ supplier: "microscale", trigger: "manual", fetchFn: fakeFeed });
+  let feedCalls = 0;
+  const countingFeed = (async (u: string, i?: RequestInit) => { feedCalls++; return (fakeFeed as unknown as (u: string, i?: RequestInit) => Promise<unknown>)(u, i); }) as unknown as typeof fetch;
+  const sync = () => run.runSync({ supplier: "microscale", trigger: "manual", fetchFn: countingFeed });
   const listing = async () => (await catalog.loadComponent(compId))!.listings[0];
+
+  it("makes one pass per run: one request per feed page, none per product", async () => {
+    await db.query("insert into components (name) values ('B'), ('C')");
+    await db.query("insert into supplier_listings (component_id, supplier, supplier_ref) select id, 'microscale', 'arduino-uno-r3#UNO' from components where name in ('B') ");
+    feedCalls = 0;
+    await sync();
+    expect(feedCalls).toBe(2); // page 1 + the empty page that ends the pass
+  });
 
   it("fetches the first price and stock", async () => {
     const r = await sync();
@@ -112,6 +122,15 @@ d("sync + quotes against Postgres", () => {
     // duplicate prices at today's prices
     const copy = await quotes.duplicateQuote(id);
     expect((await quotes.loadQuote(copy))!.total).toBe(77000);
+  });
+
+  it("ignores Hub360 rows: hidden from pricing and never synced", async () => {
+    await db.query("insert into supplier_listings (component_id, supplier, supplier_ref, price_ngn, status) values ($1, 'hub360', 'https://hub360.cc/shop/x-1', 1, 'ok')", [compId]);
+    const c = (await catalog.loadComponent(compId))!;
+    expect(c.listings.map((l) => l.supplier)).toEqual(["microscale"]);
+    const r = await run.runSync({ supplier: "hub360", trigger: "manual", fetchFn: (() => { throw new Error("must not fetch"); }) as unknown as typeof fetch });
+    expect(r.status).toBe("failed");
+    expect((await db.query("select log from sync_runs where id = $1", [r.runId]))[0].log).toMatch(/not enabled/);
   });
 
   it("prices a bundle live from its components", async () => {

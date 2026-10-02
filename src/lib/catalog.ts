@@ -1,5 +1,6 @@
 import { query } from "./db";
 import type { ListingPrice, ListingStatus, Supplier } from "./pricing";
+import { ACTIVE_SUPPLIERS } from "./suppliers";
 
 export interface ListingRecord extends ListingPrice {
   id: number;
@@ -73,7 +74,8 @@ export async function loadComponents(f: ComponentFilter = {}): Promise<Component
   }
   const comps = await query(`select c.* from components c ${where.length ? "where " + where.join(" and ") : ""} order by lower(c.category), lower(c.name)`, params);
   if (comps.length === 0) return [];
-  const listings = await query("select * from supplier_listings where component_id = any($1::int[])", [comps.map((c) => c.id)]);
+  // Listings for suppliers that are switched off stay in the database but are invisible to pricing and the UI.
+  const listings = await query("select * from supplier_listings where component_id = any($1::int[]) and supplier = any($2::text[])", [comps.map((c) => c.id), ACTIVE_SUPPLIERS]);
   const byComp = new Map<number, ListingRecord[]>();
   for (const l of listings) {
     const rec = toListing(l);

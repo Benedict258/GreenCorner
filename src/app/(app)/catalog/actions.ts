@@ -4,7 +4,8 @@ import { redirect } from "next/navigation";
 import { requireAdmin } from "@/lib/auth";
 import { query, queryOne } from "@/lib/db";
 import { runSync } from "@/lib/sync/run";
-import { hub360RefFromUrl } from "@/lib/sync/hub360";
+import { ADAPTERS } from "@/lib/sync/adapters";
+import { isActiveSupplier } from "@/lib/suppliers";
 import type { Supplier } from "@/lib/pricing";
 
 function fields(form: FormData) {
@@ -65,17 +66,12 @@ export async function linkListing(componentId: number, supplier: Supplier, ref: 
 }
 
 async function linkListingInner(componentId: number, supplier: Supplier, ref: string, unitsPerListing: number, title: string | null): Promise<{ message: string }> {
-  if (supplier !== "microscale" && supplier !== "hub360") throw new Error("Unknown supplier.");
+  const adapter = isActiveSupplier(supplier) ? ADAPTERS[supplier] : undefined;
+  if (!adapter) throw new Error("That supplier is not enabled.");
   const units = Math.floor(Number(unitsPerListing));
   if (!Number.isFinite(units) || units < 1 || units > 100000) throw new Error("Units per listing must be a whole number of at least 1.");
-  let cleanRef = ref.trim();
-  if (supplier === "hub360") {
-    const r = hub360RefFromUrl(cleanRef);
-    if (!r) throw new Error("That is not a Hub360 product URL (it should look like https://hub360.cc/shop/name-12345).");
-    cleanRef = r;
-  } else if (!/^[a-z0-9][a-z0-9-_.]*(#.+)?$/i.test(cleanRef)) {
-    throw new Error("That is not a valid Microscale listing.");
-  }
+  const cleanRef = adapter.normalizeRef(ref);
+  if (!cleanRef) throw new Error(adapter.invalidRefMessage);
   const clash = await queryOne("select component_id from supplier_listings where supplier = $1 and supplier_ref = $2 and component_id <> $3", [supplier, cleanRef, componentId]);
   if (clash) throw new Error("That supplier product is already linked to another component.");
   // New link resets price state so the first sync is accepted without a price-jump hold.
@@ -87,7 +83,8 @@ async function linkListingInner(componentId: number, supplier: Supplier, ref: st
     [componentId, supplier, cleanRef, title, units],
   );
   await query("update held_changes set decision = 'rejected', decided_at = now() where decision = 'pending' and listing_id in (select id from supplier_listings where component_id = $1 and supplier = $2)", [componentId, supplier]);
-  const r = await runSync({ supplier, trigger: "manual", componentId });
+  // Reuses the feed fetched by the search that led here, so linking does not trigger a second crawl.
+  const r = await runSync({ supplier, trigger: "manual", componentId, allowCache: true });
   revalidatePath(`/catalog/${componentId}`);
   revalidatePath("/catalog");
   return { message: r.status === "success" ? "Linked and priced." : `Linked, but the first sync ${r.status}. Check the Sync page for the reason.` };
