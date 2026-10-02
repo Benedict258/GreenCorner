@@ -9,9 +9,9 @@ export default async function NewComponent() {
   return (
     <>
       <h1>New component</h1>
-      <p className="muted">Save it, then link a Microscale and/or Hub360 listing on the next screen.</p>
+      <p className="muted">Save it, then link its Microscale listing on the next screen.</p>
       <datalist id="cats">{cats.map((c) => <option key={c} value={c} />)}</datalist>
-      <ComponentForm action={createComponent} submitLabel="Create and link suppliers" />
+      <ComponentForm action={createComponent} submitLabel="Create and link Microscale" />
     </>
   );
 }
