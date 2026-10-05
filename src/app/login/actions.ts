@@ -2,6 +2,7 @@
 import bcrypt from "bcryptjs";
 import { redirect } from "next/navigation";
 import { clearSessionCookie, setSessionCookie } from "@/lib/auth";
+import { readPasswordHash } from "@/lib/passwordHash";
 
 // Simple in-process throttle: 10 failures per 15 minutes, then locked until the window passes.
 const fails: number[] = [];
@@ -15,8 +16,9 @@ export async function login(_: { error?: string; email?: string } | undefined, f
   const email = String(form.get("email") ?? "").trim().toLowerCase();
   const password = String(form.get("password") ?? "");
   const adminEmail = (process.env.ADMIN_EMAIL ?? "").trim().toLowerCase();
-  const hash = process.env.ADMIN_PASSWORD_HASH ?? "";
-  if (!adminEmail || !hash) return { error: "Admin account is not configured on the server." };
+  if (!adminEmail || !process.env.ADMIN_PASSWORD_HASH) return { error: "Admin account is not configured on the server." };
+  const hash = readPasswordHash(process.env.ADMIN_PASSWORD_HASH);
+  if (!hash) return { error: "ADMIN_PASSWORD_HASH on the server is not a valid hash. Make a new one with npm run hash-password." };
 
   // Always run the comparison so timing does not reveal whether the email matched.
   const passwordOk = await bcrypt.compare(password, hash);

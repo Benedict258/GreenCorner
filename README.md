@@ -28,7 +28,7 @@ Next.js 16 (TypeScript), PostgreSQL, a Node sync script run by GitHub Actions.
 ```bash
 npm install
 cp .env.example .env        # fill in DATABASE_URL, AUTH_SECRET, ADMIN_EMAIL
-npm run hash-password -- 'a password of 10+ chars'   # put the output in ADMIN_PASSWORD_HASH (single-quote it)
+npm run hash-password       # asks for the password (hidden); put the output in ADMIN_PASSWORD_HASH (single-quote it in .env)
 npm run migrate
 npm run dev
 ```
@@ -55,7 +55,7 @@ The production database is **Neon Postgres** (already migrated, and the sync wor
    - `DATABASE_URL`: the same direct Neon string
    - `AUTH_SECRET`: `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`
    - `ADMIN_EMAIL`: the admin login
-   - `ADMIN_PASSWORD_HASH`: output of `npm run hash-password -- 'password'`, pasted as-is, no quotes
+   - `ADMIN_PASSWORD_HASH`: output of `npm run hash-password` (it asks for the password at a hidden prompt; on Windows don't pass it as an argument, npm mangles `" & % ^ !`), pasted as-is, no quotes
    - `SYNC_CONTACT`: `https://waste2light.com`
 3. In the GitHub repo add the secret `GCQ_DATABASE_URL` (the same direct string) and optionally the variable `GCQ_SYNC_CONTACT`. The workflow `.github/workflows/sync.yml` only runs on the **default branch** (`main`).
 4. "Sync now" in the app runs in the background of the web request (`maxDuration` 300 s). Hosts that cap request time below that should use the workflow's manual **Run workflow** button with *force* instead.
