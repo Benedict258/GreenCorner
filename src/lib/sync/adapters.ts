@@ -1,6 +1,6 @@
 import type { Supplier } from "../pricing";
 import { microscaleAdapter } from "./microscale";
-import type { Fetcher, Observation, Sleep, SupplierSearchHit } from "./types";
+import type { Fetcher, Observation, ShopProduct, Sleep, SupplierSearchHit } from "./types";
 
 export interface ObserveContext {
   fetchFn?: Fetcher;
@@ -8,6 +8,8 @@ export interface ObserveContext {
   log: (s: string) => void;
   /** Allow a recently fetched copy of the supplier data (used right after linking, never by scheduled runs). */
   allowCache?: boolean;
+  /** Receives every product in the feed the adapter just read, for the Shop. Feed-based suppliers only. */
+  onProducts?: (products: ShopProduct[]) => void;
 }
 
 /** One adapter per supplier. The sync runner and the UI only talk to this interface. */

@@ -27,7 +27,7 @@ export async function login(_: { error?: string; email?: string } | undefined, f
     return { error: "Wrong email or password.", email: String(form.get("email") ?? "") };
   }
   await setSessionCookie(adminEmail);
-  redirect("/quotes");
+  redirect("/shop");
 }
 
 export async function logout() {

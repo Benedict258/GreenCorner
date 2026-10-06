@@ -35,12 +35,18 @@ npm run dev
 
 Next.js does not read a plain `.env` for the scripts; export the variables (or use `node --env-file=.env`) before `npm run migrate` / `npm run sync`.
 
-Then: sign in, add components in **Catalog**, link supplier listings on each component's page (search, or paste a product URL; set *units per listing* for packs), and build quotes.
+Then: run `npm run sync` once (or **Sync now** in the app) so the **Shop** lists every Microscale product, sign in, and shop: **Add to cart**, then **Create quote** from the cart. The first time a product is added it becomes a Catalog component linked to its Microscale listing, so quotes, bundles and price safeguards treat it like any other component. Components can still be made by hand in **Catalog** (search, or paste a product URL; set *units per listing* for packs).
+
+### The Shop
+
+- Every full sync (scheduled, **Sync now**, or the workflow) reads the whole `products.json` feed in one pass, as before, and also stores every variant in `supplier_products`. A sync for a single component (right after linking) does not touch the Shop. Products that leave the feed leave the Shop; an empty feed never wipes it.
+- Shop prices are the Microscale price plus the component's markup (10% for products not yet in the Catalog), rounded like quotes. The cart prices with the same code as the quote builder, so the cart total is the quote total.
+- The cart lives in `cart_items` (one admin, one cart). Saving a quote made from the cart empties it.
 
 ## Tests
 
 ```bash
-npm test                                  # parsers, pricing, safeguards, schedule (no database needed)
+npm test                                  # parsers, Shop feed, pricing, safeguards, schedule (no database needed)
 npm run test:deferred                     # parked Hub360 code only
 TEST_DATABASE_URL=postgres://... npm test # also runs sync + quote integration tests. WIPES that database.
 ```
@@ -59,6 +65,7 @@ The production database is **Neon Postgres** (already migrated, and the sync wor
    - `SYNC_CONTACT`: `https://waste2light.com`
 3. In the GitHub repo add the secret `GCQ_DATABASE_URL` (the same direct string) and optionally the variable `GCQ_SYNC_CONTACT`. The workflow `.github/workflows/sync.yml` only runs on the **default branch** (`main`).
 4. "Sync now" in the app runs in the background of the web request (`maxDuration` 300 s). Hosts that cap request time below that should use the workflow's manual **Run workflow** button with *force* instead.
+5. Every release that adds a file to `db/migrations/` needs `npm run migrate` against Neon **before** the new code goes live (Vercel does not run migrations). `002_shop.sql` adds the Shop's `supplier_products` and `cart_items` tables; after it, run the workflow with *force* once so the Shop fills.
 
 ## How the rules map to the PRD
 

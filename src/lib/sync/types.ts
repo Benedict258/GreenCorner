@@ -8,6 +8,18 @@ export interface Observation {
   inStock: boolean | null; // null when the page does not say
 }
 
+/** One variant from a supplier's full public catalog, as listed in the Shop. */
+export interface ShopProduct {
+  ref: string; // same format as Observation.ref, so a Shop pick links like a searched listing
+  handle: string;
+  title: string;
+  category: string;
+  imageUrl: string | null;
+  price: number | null;
+  inStock: boolean | null;
+  position: number; // order in the supplier's feed
+}
+
 export type Fetcher = typeof fetch;
 export type Sleep = (ms: number) => Promise<void>;
 

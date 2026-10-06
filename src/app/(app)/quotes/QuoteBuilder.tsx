@@ -39,13 +39,17 @@ interface Line {
 let seq = 0;
 const newKey = () => `l${++seq}`;
 
-export default function QuoteBuilder({ catalog, initial }: { catalog: BuilderCatalog; initial: InitialQuote }) {
+/** Lines to start a new quote with, priced live (the Shop cart). */
+export interface StartLine { kind: "component" | "bundle"; refId: number; quantity: number }
+
+export default function QuoteBuilder({ catalog, initial, startLines = [], fromCart = false }: { catalog: BuilderCatalog; initial: InitialQuote; startLines?: StartLine[]; fromCart?: boolean }) {
   const router = useRouter();
   const [name, setName] = useState(initial.name);
   const [notes, setNotes] = useState(initial.notes);
-  const [lines, setLines] = useState<Line[]>(() =>
-    initial.lines.map((l) => ({ key: newKey(), kind: l.kind, refId: l.refId, quantity: l.quantity, reprice: false, frozen: l })),
-  );
+  const [lines, setLines] = useState<Line[]>(() => [
+    ...initial.lines.map((l) => ({ key: newKey(), kind: l.kind, refId: l.refId, quantity: l.quantity, reprice: false, frozen: l })),
+    ...startLines.map((l) => ({ key: newKey(), kind: l.kind, refId: l.refId, quantity: l.quantity, reprice: false, frozen: null })),
+  ]);
   const [error, setError] = useState<string | null>(null);
   const [dirty, setDirty] = useState(false);
   const [pending, start] = useTransition();
@@ -95,6 +99,7 @@ export default function QuoteBuilder({ catalog, initial }: { catalog: BuilderCat
       const res = await saveQuoteAction(
         initial.id, name, notes,
         lines.map((l) => ({ lineId: l.frozen?.lineId ?? null, kind: l.kind, refId: l.refId, quantity: l.quantity, reprice: l.reprice })),
+        fromCart,
       );
       if ("error" in res) return setError(res.error);
       setDirty(false);
@@ -107,7 +112,7 @@ export default function QuoteBuilder({ catalog, initial }: { catalog: BuilderCat
       <div className="page-head">
         <h1>{initial.id ? "Edit quote" : "New quote"}</h1>
         <div>
-          <Link className="btn" href={initial.id ? `/quotes/${initial.id}/view` : "/quotes"}>{dirty ? "Discard" : "Back"}</Link>
+          <Link className="btn" href={initial.id ? `/quotes/${initial.id}/view` : fromCart ? "/shop/cart" : "/quotes"}>{fromCart ? "Back to cart" : dirty ? "Discard" : "Back"}</Link>
           {initial.id && lines.some((l) => l.frozen) && (
             <button type="button" className="btn" onClick={() => change((ls) => ls.map((l) => ({ ...l, reprice: true })))} title="Replace saved prices with today's prices">Reprice all</button>
           )}
@@ -223,7 +228,7 @@ function Picker({ catalog, onAdd }: { catalog: BuilderCatalog; onAdd: (k: "compo
           })}
         </div></div>
       )}
-      {open && compHits.length === 0 && bundleHits.length === 0 && <p className="muted">Nothing matches. Add components in the Catalog first.</p>}
+      {open && compHits.length === 0 && bundleHits.length === 0 && <p className="muted">Nothing matches. Find it in the <Link href="/shop">Shop</Link> and add it to the cart, or add it in the Catalog.</p>}
     </div>
   );
 }

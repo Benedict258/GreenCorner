@@ -11,8 +11,9 @@ d("sync + quotes against Postgres", () => {
   let catalog: typeof import("../src/lib/catalog");
 
   let feedPrice = 12500;
+  let extraProducts: object[] = []; // more products in the feed, for the Shop tests
   const feed = (price: number, available = true) =>
-    ({ products: [{ handle: "arduino-uno-r3", title: "Arduino Uno R3", variants: [{ sku: "UNO", title: "Default Title", price: String(price), available }] }] });
+    ({ products: [{ handle: "arduino-uno-r3", title: "Arduino Uno R3", variants: [{ sku: "UNO", title: "Default Title", price: String(price), available }] }, ...extraProducts] });
   const fakeFeed = (async (u: string) => {
     const page = new URL(u).searchParams.get("page");
     return { ok: true, status: 200, json: async () => (page === "1" ? feed(feedPrice) : { products: [] }) };
@@ -31,8 +32,9 @@ d("sync + quotes against Postgres", () => {
 
   let compId = 0;
   beforeEach(async () => {
-    await db.query("truncate components, bundles, quotes, sync_runs restart identity cascade");
+    await db.query("truncate components, bundles, quotes, sync_runs, supplier_products restart identity cascade");
     feedPrice = 12500;
+    extraProducts = [];
     compId = (await db.query("insert into components (name, category) values ('Arduino Uno R3', 'Boards') returning id"))[0].id;
     await db.query("insert into supplier_listings (component_id, supplier, supplier_ref) values ($1, 'microscale', 'arduino-uno-r3#UNO')", [compId]);
   });
@@ -141,5 +143,59 @@ d("sync + quotes against Postgres", () => {
     const q = (await quotes.loadQuote(id))!;
     expect(q.lines[0].unitPrice).toBe(27500);
     expect(q.total).toBe(82500);
+  });
+
+  const relay = { handle: "relay-8ch", title: "8 channel relay", product_type: "Modules", images: [{ src: "https://cdn.shopify.com/relay.jpg" }], variants: [{ id: 77, sku: "", title: "Default Title", price: "9550.00", available: false }] };
+
+  it("lists the whole feed in the Shop even with nothing linked, and drops products that leave the feed", async () => {
+    await db.query("truncate components restart identity cascade");
+    extraProducts = [relay];
+    expect((await sync()).status).toBe("success");
+    expect(await db.query("select ref, title, category, image_url, price_ngn, in_stock from supplier_products order by position")).toEqual([
+      { ref: "arduino-uno-r3#UNO", title: "Arduino Uno R3", category: "Other", image_url: null, price_ngn: 12500, in_stock: true },
+      { ref: "relay-8ch#id:77", title: "8 channel relay", category: "Modules", image_url: "https://cdn.shopify.com/relay.jpg", price_ngn: 9550, in_stock: false },
+    ]);
+    extraProducts = [];
+    await sync();
+    expect((await db.query("select ref from supplier_products")).map((r) => r.ref)).toEqual(["arduino-uno-r3#UNO"]);
+  });
+
+  it("a single-component sync (after linking) leaves the Shop alone", async () => {
+    await sync();
+    await db.query("delete from supplier_products");
+    await run.runSync({ supplier: "microscale", trigger: "manual", componentId: compId, fetchFn: countingFeed });
+    expect(await db.query("select 1 from supplier_products")).toHaveLength(0);
+  });
+
+  it("adds a Shop product to the cart as one priced, linked component and quotes it", async () => {
+    const shop = await import("../src/lib/shop");
+    extraProducts = [relay];
+    await sync();
+    const page = await shop.loadShop({ q: "relay" });
+    expect(page.items).toHaveLength(1);
+    expect(page.items[0]).toMatchObject({ ref: "relay-8ch#id:77", category: "Modules", price: 9550, inStock: false, componentId: null, quotePrice: 10505, inCart: 0 });
+
+    const { componentId } = await shop.addToCart("relay-8ch#id:77", 2);
+    await shop.addToCart("relay-8ch#id:77", 3);
+    expect(await shop.loadCart()).toMatchObject([{ componentId, quantity: 5, imageUrl: "https://cdn.shopify.com/relay.jpg" }]);
+    const c = (await catalog.loadComponent(componentId))!;
+    expect(c).toMatchObject({ name: "8 channel relay", category: "Modules", markupPct: 10, active: true });
+    expect(c.listings).toHaveLength(1);
+    expect(c.listings[0]).toMatchObject({ supplierRef: "relay-8ch#id:77", price: 9550, inStock: false, status: "ok" });
+    expect((await shop.loadShop({ q: "relay" })).items[0]).toMatchObject({ componentId, inCart: 5 });
+
+    // The next scheduled sync treats it like any linked listing.
+    expect((await sync()).failed).toBe(0);
+    // A deactivated component is brought back, not duplicated, when picked again.
+    await db.query("update components set active = false where id = $1", [componentId]);
+    expect((await shop.addToCart("relay-8ch#id:77", 1)).componentId).toBe(componentId);
+    expect((await catalog.loadComponent(componentId))!.active).toBe(true);
+    expect(await db.query("select 1 from supplier_listings where supplier_ref = 'relay-8ch#id:77'")).toHaveLength(1);
+
+    const id = await quotes.saveQuote(null, "From cart", "", (await shop.loadCart()).map((l) => ({ kind: "component" as const, refId: l.componentId, quantity: l.quantity })));
+    expect((await quotes.loadQuote(id))!.total).toBe(10505 * 6);
+    await shop.clearCart();
+    expect(await shop.cartCount()).toBe(0);
+    await expect(shop.addToCart("not-in-feed#X", 1)).rejects.toThrow(/no longer in the Microscale catalog/);
   });
 });

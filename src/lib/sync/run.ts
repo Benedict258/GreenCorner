@@ -5,7 +5,7 @@ import type { Supplier } from "../pricing";
 import { decide } from "./safeguards";
 import { ACTIVE_SUPPLIERS } from "../suppliers";
 import { ADAPTERS } from "./adapters";
-import type { Fetcher, Observation, Sleep } from "./types";
+import type { Fetcher, Observation, ShopProduct, Sleep } from "./types";
 
 export interface RunOptions {
   supplier: Supplier;
@@ -86,8 +86,14 @@ export async function runSync(opts: RunOptions): Promise<RunResult> {
     const listings: ListingRow[] = (await client.query(sql + " order by l.id", params)).rows;
     log(`${supplier}: ${listings.length} mapped listing(s) to sync.`);
 
-    if (listings.length > 0) {
-      const results = await adapter.observe(listings.map((l) => l.supplier_ref), { fetchFn: opts.fetchFn, sleep: opts.sleep, log, allowCache: opts.allowCache });
+    // A full run reads the feed even with nothing linked yet, so the Shop lists every product.
+    const fullRun = !opts.componentId;
+    const shop: { products?: ShopProduct[] } = {};
+    if (listings.length > 0 || fullRun) {
+      const results = await adapter.observe(listings.map((l) => l.supplier_ref), {
+        fetchFn: opts.fetchFn, sleep: opts.sleep, log, allowCache: opts.allowCache,
+        onProducts: fullRun ? (p) => { shop.products = p; } : undefined,
+      });
       for (const l of listings) {
         const r = results.get(l.supplier_ref);
         if (!r) await recordError(client, l, "Not found at the supplier. Re-link this listing.", counts, log);
@@ -95,6 +101,7 @@ export async function runSync(opts: RunOptions): Promise<RunResult> {
         else await applyObservation(client, l, r, settings, counts, log);
       }
     }
+    if (shop.products) await storeShopProducts(client, supplier, shop.products, log);
 
     const staleRes = await client.query(
       `update supplier_listings set status = 'stale'
@@ -114,6 +121,36 @@ export async function runSync(opts: RunOptions): Promise<RunResult> {
   } finally {
     if (locked) await client.query("select pg_advisory_unlock($1, $2)", [LOCK_NS, lockKey(supplier)]).catch(() => undefined);
     client.release();
+  }
+}
+
+/** Replaces the supplier's Shop rows with this feed, in one transaction. Products gone from the feed are removed. */
+export async function storeShopProducts(client: PoolClient, supplier: Supplier, rows: ShopProduct[], log: Log) {
+  if (rows.length === 0) {
+    log("Shop: the feed listed no products, so the Shop was left as it was.");
+    return;
+  }
+  const seenAt = new Date();
+  await client.query("begin");
+  try {
+    for (let i = 0; i < rows.length; i += 500) {
+      const b = rows.slice(i, i + 500);
+      await client.query(
+        `insert into supplier_products (supplier, ref, handle, title, category, image_url, price_ngn, in_stock, position, seen_at)
+         select $1, u.*, $10 from unnest($2::text[], $3::text[], $4::text[], $5::text[], $6::text[], $7::numeric[], $8::boolean[], $9::int[]) as u
+         on conflict (supplier, ref) do update set handle = excluded.handle, title = excluded.title, category = excluded.category,
+           image_url = excluded.image_url, price_ngn = excluded.price_ngn, in_stock = excluded.in_stock,
+           position = excluded.position, seen_at = excluded.seen_at`,
+        [supplier, b.map((r) => r.ref), b.map((r) => r.handle), b.map((r) => r.title), b.map((r) => r.category),
+          b.map((r) => r.imageUrl), b.map((r) => r.price), b.map((r) => r.inStock), b.map((r) => r.position), seenAt],
+      );
+    }
+    const gone = await client.query("delete from supplier_products where supplier = $1 and seen_at < $2", [supplier, seenAt]);
+    await client.query("commit");
+    log(`Shop: ${rows.length} products listed${gone.rowCount ? `, ${gone.rowCount} no longer in the feed removed` : ""}.`);
+  } catch (e) {
+    await client.query("rollback");
+    throw e;
   }
 }
 
