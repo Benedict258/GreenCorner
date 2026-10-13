@@ -111,12 +111,25 @@ details summary { cursor: pointer; color: var(--color-primary); font-size: .85re
   th, td { padding: 6px; }
 }
 
-/* print: only the quote */
-.print-only { display: none; }
+/* quotation: builder fields and PDF preview */
+.nowrap { white-space: nowrap; }
+.doc-meta { margin: 0; padding-bottom: 10px; flex: 1 1 260px; }
+.builder-table td { vertical-align: top; }
+.desc-cell { min-width: 280px; width: 55%; }
+.desc-cell textarea { width: 100%; resize: vertical; }
+.line-info { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 4px; }
+input.price { width: 8.5em; text-align: right; }
+input[aria-invalid="true"] { border-color: var(--color-danger); outline-color: var(--color-danger); }
+.price-cell small { display: block; color: var(--color-muted); margin-top: 2px; }
+.link-btn { background: none; border: 0; padding: 0; font: inherit; color: var(--color-primary); text-decoration: underline; cursor: pointer; }
+.pdf-preview { display: block; width: 100%; height: min(1100px, 85vh); border: 1px solid var(--color-border); border-radius: var(--radius); background: #fff; }
+details.internal { margin-top: var(--space); }
+details.internal > summary { font-size: .95rem; font-weight: 600; color: var(--color-text); }
+
+/* print (the customer copy is the PDF; this keeps a printed screen readable) */
 @media print {
   body { background: #fff; }
-  .site-header, .no-print, .btn { display: none !important; }
-  .print-only { display: block; }
+  .site-header, .btn { display: none !important; }
   .page { max-width: none; padding: 0; }
   .card, .table-wrap { border: 0; padding: 0; }
   .badge { border-color: #000; color: #000; background: none; }

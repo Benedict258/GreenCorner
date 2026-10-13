@@ -15,15 +15,17 @@ export default async function QuotesPage() {
       </div>
       <div className="table-wrap">
         <table>
-          <thead><tr><th>Name</th><th>Lines</th><th className="num">Total</th><th>Updated</th></tr></thead>
+          <thead><tr><th>Quotation No</th><th>Bill to</th><th>Lines</th><th className="num">Total</th><th>Updated</th><th></th></tr></thead>
           <tbody>
-            {quotes.length === 0 && <tr><td colSpan={4} className="muted">No quotes yet. Start one with New quote.</td></tr>}
+            {quotes.length === 0 && <tr><td colSpan={6} className="muted">No quotes yet. Start one with New quote.</td></tr>}
             {quotes.map((q) => (
               <tr key={q.id}>
-                <td><Link href={`/quotes/${q.id}/view`}>{q.name}</Link></td>
+                <td className="nowrap"><Link href={`/quotes/${q.id}/view`}>{q.quoteNumber}</Link></td>
+                <td>{q.name}</td>
                 <td>{q.lines}</td>
                 <td className="num">{formatNaira(q.total)}</td>
                 <td>{formatLagos(q.updatedAt)}</td>
+                <td><a className="btn small" href={`/api/quotes/${q.id}/pdf`}>PDF</a></td>
               </tr>
             ))}
           </tbody>

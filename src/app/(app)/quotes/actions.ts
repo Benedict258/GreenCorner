@@ -2,14 +2,16 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { requireAdmin } from "@/lib/auth";
-import { deleteQuote, duplicateQuote, saveQuote, type LineInput } from "@/lib/quotes";
+import { deleteQuote, duplicateQuote, saveQuote, type LineInput, type QuoteHeader } from "@/lib/quotes";
 import { clearCart } from "@/lib/shop";
 
 // Returns errors instead of throwing: production builds hide thrown messages from the browser.
-export async function saveQuoteAction(id: number | null, name: string, notes: string, lines: LineInput[], fromCart = false): Promise<{ id: number } | { error: string }> {
+export async function saveQuoteAction(id: number | null, header: QuoteHeader, lines: LineInput[], fromCart = false): Promise<{ id: number } | { error: string }> {
   await requireAdmin();
   try {
-    const saved = await saveQuote(id, String(name).slice(0, 200), String(notes).slice(0, 2000), lines);
+    const saved = await saveQuote(id, {
+      billTo: String(header.billTo ?? ""), attn: String(header.attn ?? ""), notes: String(header.notes ?? ""), validUntil: String(header.validUntil ?? ""),
+    }, lines);
     // The cart has become this quote. Lines removed in the builder are not left behind in the cart.
     if (fromCart) {
       await clearCart();

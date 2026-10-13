@@ -37,6 +37,15 @@ Next.js does not read a plain `.env` for the scripts; export the variables (or u
 
 Then: run `npm run sync` once (or **Sync now** in the app) so the **Shop** lists every Microscale product, sign in, and shop: **Add to cart**, then **Create quote** from the cart. The first time a product is added it becomes a Catalog component linked to its Microscale listing, so quotes, bundles and price safeguards treat it like any other component. Components can still be made by hand in **Catalog** (search, or paste a product URL; set *units per listing* for packs).
 
+### The quotation PDF
+
+Each quote page has **Download PDF** (`/api/quotes/<id>/pdf`, signed-in only), laid out like Waste2Light's paper quotation, in the website's colours.
+
+- Fixed on every quotation (`src/lib/quoteDocument.ts`, `COMPANY`): the letterhead with logo, "QUOTATION", Payment Details, "Authorized by (Waste2Light Ltd)" and the "Name, Signature & Date" line.
+- Filled in on the quote: Bill To, Attn, Valid Until (required, chosen by hand), notes (one bullet per line), and per line the quantity, the description as printed, and the unit price (calculated from Microscale + markup, or typed by hand). Custom lines that are not in the Catalog are allowed.
+- Set automatically on first save and never changed: the quotation number `W2L-<customer initials>-<YYYYMMDD>` (a second one that day gets `-2`) and the date (Lagos). Amount and Amount in words are calculated.
+- The PDF is made on the server with `@react-pdf/renderer`, using Inter (it has the ₦ sign) and Manrope from `assets/fonts`. A4; the column headings repeat on continuation pages and the payment/signature block is never split.
+
 ### The Shop
 
 - Every full sync (scheduled, **Sync now**, or the workflow) reads the whole `products.json` feed in one pass, as before, and also stores every variant in `supplier_products`. A sync for a single component (right after linking) does not touch the Shop. Products that leave the feed leave the Shop; an empty feed never wipes it.

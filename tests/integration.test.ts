@@ -1,5 +1,6 @@
 // Runs against a real Postgres. Skipped unless TEST_DATABASE_URL is set. WARNING: wipes that database's data.
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
+import { lagosToday } from "../src/lib/quoteDocument";
 
 const url = process.env.TEST_DATABASE_URL;
 const d = url ? describe : describe.skip;
@@ -30,6 +31,7 @@ d("sync + quotes against Postgres", () => {
   });
   afterAll(async () => db?.closePool());
 
+  const h = (billTo: string) => ({ billTo, attn: "", notes: "", validUntil: "2099-12-31" });
   let compId = 0;
   beforeEach(async () => {
     await db.query("truncate components, bundles, quotes, sync_runs, supplier_products restart identity cascade");
@@ -107,19 +109,19 @@ d("sync + quotes against Postgres", () => {
 
   it("saved quotes keep their prices after a sync; quantity changes keep the snapshot", async () => {
     await sync();
-    const id = await quotes.saveQuote(null, "School A", "", [{ kind: "component", refId: compId, quantity: 4 }]);
+    const id = await quotes.saveQuote(null, h("School A"), [{ kind: "component", refId: compId, quantity: 4 }]);
     expect((await quotes.loadQuote(id))!.total).toBe(55000);
     feedPrice = 14000;
     await sync();
     let q = (await quotes.loadQuote(id))!;
     expect(q.total).toBe(55000);
     // edit quantity: snapshot unit price is kept
-    await quotes.saveQuote(id, "School A", "", [{ lineId: q.lines[0].id, kind: "component", refId: compId, quantity: 5 }]);
+    await quotes.saveQuote(id, h("School A"), [{ lineId: q.lines[0].id, kind: "component", refId: compId, quantity: 5 }]);
     q = (await quotes.loadQuote(id))!;
     expect(q.lines[0].unitPrice).toBe(13750);
     expect(q.total).toBe(68750);
     // reprice picks up today's price
-    await quotes.saveQuote(id, "School A", "", [{ lineId: q.lines[0].id, kind: "component", refId: compId, quantity: 5, reprice: true }]);
+    await quotes.saveQuote(id, h("School A"), [{ lineId: q.lines[0].id, kind: "component", refId: compId, quantity: 5, reprice: true }]);
     expect((await quotes.loadQuote(id))!.lines[0].unitPrice).toBe(15400);
     // duplicate prices at today's prices
     const copy = await quotes.duplicateQuote(id);
@@ -139,7 +141,7 @@ d("sync + quotes against Postgres", () => {
     await sync();
     const b = (await db.query("insert into bundles (name) values ('Starter kit') returning id"))[0].id;
     await db.query("insert into bundle_items (bundle_id, component_id, quantity) values ($1, $2, 2)", [b, compId]);
-    const id = await quotes.saveQuote(null, "Kit", "", [{ kind: "bundle", refId: b, quantity: 3 }]);
+    const id = await quotes.saveQuote(null, h("Kit"), [{ kind: "bundle", refId: b, quantity: 3 }]);
     const q = (await quotes.loadQuote(id))!;
     expect(q.lines[0].unitPrice).toBe(27500);
     expect(q.total).toBe(82500);
@@ -192,10 +194,81 @@ d("sync + quotes against Postgres", () => {
     expect((await catalog.loadComponent(componentId))!.active).toBe(true);
     expect(await db.query("select 1 from supplier_listings where supplier_ref = 'relay-8ch#id:77'")).toHaveLength(1);
 
-    const id = await quotes.saveQuote(null, "From cart", "", (await shop.loadCart()).map((l) => ({ kind: "component" as const, refId: l.componentId, quantity: l.quantity })));
+    const id = await quotes.saveQuote(null, h("From cart"), (await shop.loadCart()).map((l) => ({ kind: "component" as const, refId: l.componentId, quantity: l.quantity })));
     expect((await quotes.loadQuote(id))!.total).toBe(10505 * 6);
     await shop.clearCart();
     expect(await shop.cartCount()).toBe(0);
     await expect(shop.addToCart("not-in-feed#X", 1)).rejects.toThrow(/no longer in the Microscale catalog/);
+  });
+
+  describe("quotation document", () => {
+    const doc = { billTo: "Superior Minds Academy", attn: "The School Administrator", notes: "First point\nSecond point", validUntil: "2099-12-31" };
+
+    it("numbers a quote W2L-<initials>-<date>, adds -2 on a clash, and keeps number and date on edit", async () => {
+      await sync();
+      const ymd = lagosToday().replaceAll("-", "");
+      const a = await quotes.saveQuote(null, doc, [{ kind: "component", refId: compId, quantity: 1 }]);
+      const b = await quotes.saveQuote(null, doc, [{ kind: "component", refId: compId, quantity: 1 }]);
+      const qa = (await quotes.loadQuote(a))!;
+      expect(qa).toMatchObject({ quoteNumber: `W2L-SMA-${ymd}`, quoteDate: lagosToday(), validUntil: "2099-12-31", attn: "The School Administrator", name: "Superior Minds Academy" });
+      expect((await quotes.loadQuote(b))!.quoteNumber).toBe(`W2L-SMA-${ymd}-2`);
+      // Renaming the customer later does not renumber the quote.
+      await quotes.saveQuote(a, { ...doc, billTo: "Another School" }, [{ lineId: qa.lines[0].id, kind: "component", refId: compId, quantity: 2 }]);
+      expect((await quotes.loadQuote(a))!).toMatchObject({ quoteNumber: `W2L-SMA-${ymd}`, quoteDate: lagosToday(), name: "Another School" });
+    });
+
+    it("requires Bill To and a Valid Until date on or after the quote date", async () => {
+      await sync();
+      const line = [{ kind: "component" as const, refId: compId, quantity: 1 }];
+      await expect(quotes.saveQuote(null, { ...doc, billTo: " " }, line)).rejects.toThrow(/Bill To/);
+      await expect(quotes.saveQuote(null, { ...doc, validUntil: "" }, line)).rejects.toThrow(/Valid Until/);
+      await expect(quotes.saveQuote(null, { ...doc, validUntil: "2000-01-01" }, line)).rejects.toThrow(/before the quotation date/);
+    });
+
+    it("keeps hand-set prices, descriptions and custom lines; clearing a hand-set price reprices at today's price", async () => {
+      await sync(); // 12,500 -> 13,750 with markup
+      const id = await quotes.saveQuote(null, doc, [
+        { kind: "component", refId: compId, quantity: 2, description: "Arduino Uno R3 board, with USB cable", unitPrice: 15000 },
+        { kind: "custom", refId: null, quantity: 5, description: "Green Energy Corner STEM Master Kit — Includes: Arduino Uno, Solar Cell", unitPrice: 60000 },
+      ]);
+      let q = (await quotes.loadQuote(id))!;
+      expect(q.lines.map((l) => [l.description, l.unitPrice, l.priceOverride, l.lineTotal])).toEqual([
+        ["Arduino Uno R3 board, with USB cable", 15000, true, 30000],
+        ["Green Energy Corner STEM Master Kit — Includes: Arduino Uno, Solar Cell", 60000, true, 300000],
+      ]);
+      expect(q.total).toBe(330000);
+
+      // Supplier price moves; the hand-set price stays. Then clear it: today's calculated price applies.
+      feedPrice = 13000;
+      await sync();
+      const keep = q.lines.map((l) => ({ lineId: l.id, kind: quotes.lineKind(l), refId: l.componentId, quantity: l.quantity, description: l.description, unitPrice: l.unitPrice }));
+      await quotes.saveQuote(id, doc, keep);
+      expect((await quotes.loadQuote(id))!.total).toBe(330000);
+      await quotes.saveQuote(id, doc, [{ ...keep[0], unitPrice: null }, keep[1]]);
+      q = (await quotes.loadQuote(id))!;
+      expect(q.lines[0]).toMatchObject({ unitPrice: 14300, priceOverride: false, description: "Arduino Uno R3 board, with USB cable" });
+
+      await expect(quotes.saveQuote(null, doc, [{ kind: "custom", refId: null, quantity: 1, description: "No price" }])).rejects.toThrow(/Set a unit price/);
+      await expect(quotes.saveQuote(null, doc, [{ kind: "custom", refId: null, quantity: 1, description: "", unitPrice: 5 }])).rejects.toThrow(/needs a description/);
+    });
+
+    it("duplicates with a new number and today's date, keeping custom lines and the validity length", async () => {
+      await sync();
+      const id = await quotes.saveQuote(null, { ...doc, validUntil: new Date(Date.parse(lagosToday()) + 14 * 86_400_000).toISOString().slice(0, 10) }, [
+        { kind: "custom", refId: null, quantity: 5, description: "STEM Master Kit", unitPrice: 60000 },
+      ]);
+      const copy = (await quotes.loadQuote(await quotes.duplicateQuote(id)))!;
+      expect(copy.quoteNumber).toMatch(/-2$/);
+      expect(copy.lines[0]).toMatchObject({ description: "STEM Master Kit", unitPrice: 60000, priceOverride: true });
+      expect((Date.parse(copy.validUntil!) - Date.parse(copy.quoteDate)) / 86_400_000).toBe(14);
+    });
+
+    it("renders a saved quote to a PDF", async () => {
+      await sync();
+      const id = await quotes.saveQuote(null, doc, [{ kind: "component", refId: compId, quantity: 3 }]);
+      const { renderQuotationPdf } = await import("../src/lib/quotePdf");
+      const pdf = await renderQuotationPdf((await quotes.loadQuote(id))!);
+      expect(pdf.subarray(0, 5).toString()).toBe("%PDF-");
+    }, 60_000);
   });
 });

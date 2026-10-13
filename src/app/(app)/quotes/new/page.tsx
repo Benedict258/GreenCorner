@@ -10,7 +10,7 @@ export default async function NewQuote({ searchParams }: { searchParams: Promise
   return (
     <QuoteBuilder
       catalog={catalog}
-      initial={{ id: null, name: "", notes: "", lines: [] }}
+      initial={{ id: null, billTo: "", attn: "", notes: "", validUntil: "", quoteNumber: null, quoteDate: null, lines: [] }}
       startLines={cart.map((l) => ({ kind: "component" as const, refId: l.componentId, quantity: l.quantity }))}
       fromCart={fromCart}
     />

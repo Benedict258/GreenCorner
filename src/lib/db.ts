@@ -3,6 +3,8 @@ import { Pool, types, type PoolClient, type QueryResultRow } from "pg";
 // numeric -> JS number. Prices are at most 2 decimal places and far below 2^53.
 types.setTypeParser(1700, (v) => Number(v));
 types.setTypeParser(20, (v) => Number(v));
+// date -> "YYYY-MM-DD" as stored. A JS Date would be local midnight and could shift a day with the server's timezone.
+types.setTypeParser(1082, (v) => v);
 
 let pool: Pool | undefined;
 
