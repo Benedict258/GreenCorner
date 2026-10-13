@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Site header</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Manrope:wght@500;700;800&amp;display=swap" rel="stylesheet" data-dc-tpl="1">
+<style>
+:root{--color-bg:#f7f8f3;--color-text:#17231c;--color-muted:#66736b;--color-border:#d8dad5;--color-primary:#0c5c2e;--color-forest:#0c4a23;--color-primary-soft:#e7f4eb;--font-head:'Manrope',system-ui,sans-serif;--font-body:'Inter',system-ui,sans-serif}
+body{margin:0}
+.site-header{font-family:var(--font-body);color:var(--color-text);background:#fff;border-bottom:1px solid var(--color-border)}
+.site-header *,.site-header *::before,.site-header *::after{box-sizing:border-box}
+.site-header a{color:inherit}
+.site-header a:focus-visible,.site-header button:focus-visible,.site-header input:focus-visible{outline:2px solid var(--color-text);outline-offset:2px}
+.icon{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.skip-link{position:absolute;left:8px;top:-60px;background:var(--color-forest);color:#fff;padding:10px 16px;border-radius:8px;z-index:5;font:600 14px var(--font-body);text-decoration:none}
+.skip-link:focus{top:8px}
+.strip{background:var(--color-primary-soft);color:var(--color-forest);font-size:13px}
+.strip__in{position:relative;max-width:1200px;margin:0 auto;padding:0 56px;min-height:40px;display:flex;align-items:center;justify-content:center;text-align:center}
+.strip__close{position:absolute;right:6px;top:0;width:44px;height:40px;display:grid;place-items:center;border:0;background:none;color:var(--color-forest);cursor:pointer;border-radius:50%}
+.strip__close .icon{width:16px;height:16px}
+.bar{max-width:1200px;margin:0 auto;padding:0 24px;min-height:72px;display:flex;align-items:center;gap:20px}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.logo__mark{width:34px;height:34px;color:var(--color-primary)}
+.logo__word{font:800 20px/1 var(--font-head);letter-spacing:-.02em}
+.logo__word b{color:var(--color-primary);font-weight:800}
+.logo__tag{font:600 11px/1 var(--font-body);letter-spacing:.08em;text-transform:uppercase;background:var(--color-primary-soft);color:var(--color-primary);padding:5px 8px;border-radius:999px}
+.nav{display:flex;gap:2px;margin:0 auto}
+.nav__link{display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border-radius:999px;text-decoration:none;font:500 15px var(--font-body)}
+.nav__link:hover{background:var(--color-primary-soft)}
+.nav__link--active{background:var(--color-primary-soft);color:var(--color-primary);font-weight:600}
+.search{display:flex;align-items:center;gap:8px;width:250px;min-height:44px;padding:0 14px;background:var(--color-bg);border:1px solid var(--color-border);border-radius:999px;color:var(--color-muted)}
+.search:focus-within{border-color:var(--color-primary);background:#fff}
+.search input{flex:1;min-width:0;border:0;outline:0;background:none;font:400 15px var(--font-body);color:var(--color-text)}
+.search input:focus-visible{outline:0}
+.actions{display:flex;align-items:center;gap:2px}
+.icon-btn{position:relative;display:grid;place-items:center;width:44px;height:44px;border:0;background:none;border-radius:50%;color:var(--color-text);cursor:pointer;text-decoration:none}
+.icon-btn:hover{background:var(--color-primary-soft)}
+.icon-btn__badge{position:absolute;top:3px;right:1px;min-width:20px;height:20px;padding:0 5px;border-radius:10px;background:var(--color-primary);color:#fff;font:700 11px/20px var(--font-body);text-align:center}
+.icon-btn--phone{display:none}
+@media(max-width:1000px){.nav,.search,.icon-btn--account{display:none}.icon-btn--phone{display:grid}.bar{gap:4px;padding:0 12px 0 16px}.logo{margin-right:auto}}
+@media(max-width:480px){.logo__tag{display:none}.strip__in{padding:0 48px 0 16px;text-align:left;font-size:12.5px}}
+.component{position:relative;height:auto}
+#root,#root>.component{height:auto}
+</style>
+</head>
+<body>
+
+<div id="root"><div class="component"><header class="site-header"><a class="skip-link" href="#main">Skip to content</a><div class="strip"><div class="strip__in"><p>Delivery and pickup in Minna, Niger State. Free delivery on every order.</p><button class="strip__close" type="button" aria-label="Dismiss announcement"><svg class="icon" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button></div></div><div class="bar"><a class="logo" href="index.html" aria-label="Waste2Light Store, home"><svg class="logo__mark" viewBox="0 0 34 34" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="17" cy="15" r="9"></circle><path d="M13 27h8M14.5 30h5"></path><path d="M12 15c0-3 2-5 5-5 0 3-2 5-5 5zM17 15v6"></path></svg><span class="logo__word">Waste<b>2</b>Light</span><span class="logo__tag">Store</span></a><nav aria-label="Main"><div class="nav"><a class="nav__link" href="Shop.html">Shop</a><a class="nav__link" href="Projects.html">Projects</a><a class="nav__link" href="index.html#schools">For schools</a><a class="nav__link" href="About.html">About</a><a class="nav__link" href="Contact.html">Contact</a></div></nav><form class="search" role="search"><svg class="icon" aria-hidden="true"><circle cx="11" cy="11" r="6.5"></circle><path d="M16 16l4.5 4.5"></path></svg><label class="sr-only" for="hdr-q">Search components</label><input id="hdr-q" type="search" placeholder="Search components"></form><div class="actions"><button class="icon-btn icon-btn--phone" type="button" aria-label="Search"><svg class="icon" aria-hidden="true"><circle cx="11" cy="11" r="6.5"></circle><path d="M16 16l4.5 4.5"></path></svg></button><a class="icon-btn icon-btn--account" href="AccountOrders.html" aria-label="Account"><svg class="icon" aria-hidden="true"><circle cx="12" cy="8" r="3.5"></circle><path d="M5 20c0-3.6 3.1-6 7-6s7 2.4 7 6"></path></svg></a><a class="icon-btn" href="Cart.html" aria-label="Cart, 3 items"><svg class="icon" aria-hidden="true"><path d="M3 4h2l2.4 11.2a1.5 1.5 0 0 0 1.5 1.2h7.7a1.5 1.5 0 0 0 1.5-1.1L20 8H6.2"></path><circle cx="9.5" cy="20" r="1"></circle><circle cx="17" cy="20" r="1"></circle></svg><span class="icon-btn__badge"><span class="sc-interp">3</span></span></a><a class="icon-btn icon-btn--phone" href="MenuM.html" aria-label="Open menu"><svg class="icon" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"></path></svg></a></div></div></header></div></div>
+
+
+
+
+</body>
+</html>

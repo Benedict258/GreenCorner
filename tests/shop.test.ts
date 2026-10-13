@@ -57,15 +57,18 @@ describe("parseShopProducts", () => {
     const rows = parseShopProducts({
       products: [{
         handle: "pi-5", title: "Raspberry Pi 5", product_type: " ", images: [{ src: "https://cdn.shopify.com/pi.jpg" }],
+        body_html: '<p>A fast board. Ships from <a href="https://www.microscale.net">Microscale</a> today.</p><p>Fan sold separately <small>(MSC-2782)</small>.</p>',
         variants: [
           { id: 1, sku: "PI5-4", title: "4GB", price: "90000.00", available: true },
           { id: 2, sku: "PI5-8", title: "8GB", price: "0.00", available: false, featured_image: { src: "https://cdn.shopify.com/pi8.jpg" } },
         ],
       }],
     }, 10);
+    // The description drops the paragraph naming the supplier and its stock code; images list the variant's own first.
+    const description = "<p>Fan sold separately.</p>";
     expect(rows).toEqual([
-      { ref: "pi-5#PI5-4", handle: "pi-5", title: "Raspberry Pi 5 (4GB)", category: "Other", imageUrl: "https://cdn.shopify.com/pi.jpg", price: 90000, inStock: true, position: 10 },
-      { ref: "pi-5#PI5-8", handle: "pi-5", title: "Raspberry Pi 5 (8GB)", category: "Other", imageUrl: "https://cdn.shopify.com/pi8.jpg", price: null, inStock: false, position: 11 },
+      { ref: "pi-5#PI5-4", handle: "pi-5", title: "Raspberry Pi 5 (4GB)", category: "Other", imageUrl: "https://cdn.shopify.com/pi.jpg", images: ["https://cdn.shopify.com/pi.jpg"], description, price: 90000, inStock: true, position: 10 },
+      { ref: "pi-5#PI5-8", handle: "pi-5", title: "Raspberry Pi 5 (8GB)", category: "Other", imageUrl: "https://cdn.shopify.com/pi8.jpg", images: ["https://cdn.shopify.com/pi8.jpg", "https://cdn.shopify.com/pi.jpg"], description, price: null, inStock: false, position: 11 },
     ]);
   });
 

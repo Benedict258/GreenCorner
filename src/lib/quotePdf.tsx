@@ -90,6 +90,7 @@ const s = StyleSheet.create({
   signCaption: { fontSize: 9, color: C.muted, marginTop: 4 },
 
   footer: { position: "absolute", bottom: 24, left: 48, fontSize: 8, color: C.muted },
+  draft: { marginTop: 8, padding: 6, backgroundColor: "#fdf0d4", color: "#8a5a00", fontSize: 9, fontWeight: 600, textAlign: "center" },
 });
 
 function LogoMark({ size }: { size: number }) {
@@ -102,10 +103,22 @@ function LogoMark({ size }: { size: number }) {
   );
 }
 
-export function QuotationDocument({ q }: { q: QuoteRecord }) {
+export type DocVariant = "quotation" | "draft" | "receipt";
+
+/** The fields a document needs. A saved quote has them all; a draft request or a paid order is mapped onto them. */
+export type DocData = Pick<QuoteRecord, "name" | "attn" | "notes" | "quoteNumber" | "quoteDate" | "validUntil" | "total"> & {
+  lines: Pick<QuoteRecord["lines"][number], "id" | "quantity" | "description" | "unitPrice" | "lineTotal">[];
+  /** Receipt only: e.g. [["Paid on", "13 October 2026"], ["Paid by", "Paystack (card)"]] */
+  receiptLines?: [string, string][];
+};
+
+const TITLE: Record<DocVariant, string> = { quotation: "QUOTATION", draft: "DRAFT QUOTATION", receipt: "RECEIPT" };
+const NUMBER_LABEL: Record<DocVariant, string> = { quotation: "Quotation No", draft: "Request No", receipt: "Order No" };
+
+export function QuotationDocument({ q, variant = "quotation" }: { q: DocData; variant?: DocVariant }) {
   const bullets = notesToBullets(q.notes);
   return (
-    <Document title={`Quotation ${q.quoteNumber}`} author="Waste2Light Ltd" subject={`Quotation for ${q.name}`} creator="Green Corner Quote Tool">
+    <Document title={`${variant === "receipt" ? "Receipt" : "Quotation"} ${q.quoteNumber}`} author="Waste2Light Ltd" subject={`${variant === "receipt" ? "Receipt" : "Quotation"} for ${q.name}`} creator="Waste2Light Store">
       <Page size="A4" style={s.page}>
         {/* Letterhead: fixed */}
         <View style={s.letterhead}>
@@ -116,8 +129,9 @@ export function QuotationDocument({ q }: { q: QuoteRecord }) {
           </View>
         </View>
         <View style={s.ruleThick} />
-        <Text style={s.title}>QUOTATION</Text>
+        <Text style={s.title}>{TITLE[variant]}</Text>
         <View style={s.ruleThin} />
+        {variant === "draft" ? <Text style={s.draft}>DRAFT, not an official quotation. Prices may change; Waste2Light will send the official quotation.</Text> : null}
 
         {/* Bill To and quotation details */}
         <View style={s.meta}>
@@ -127,8 +141,9 @@ export function QuotationDocument({ q }: { q: QuoteRecord }) {
             {q.attn ? <Text style={s.metaLine}>Attn: {q.attn}</Text> : null}
           </View>
           <View style={s.metaRight}>
-            <Text style={s.metaLine}>Quotation No: <Text style={s.metaStrong}>{q.quoteNumber}</Text></Text>
+            <Text style={s.metaLine}>{NUMBER_LABEL[variant]}: <Text style={s.metaStrong}>{q.quoteNumber}</Text></Text>
             <Text style={s.metaLine}>Date: <Text style={s.metaStrong}>{formatDocDate(q.quoteDate)}</Text></Text>
+            {q.receiptLines?.map(([k, v]) => <Text key={k} style={s.metaLine}>{k}: <Text style={s.metaStrong}>{v}</Text></Text>)}
             {q.validUntil ? <Text style={s.metaLine}>Valid Until: <Text style={s.metaStrong}>{formatDocDate(q.validUntil)}</Text></Text> : null}
           </View>
         </View>
@@ -151,7 +166,7 @@ export function QuotationDocument({ q }: { q: QuoteRecord }) {
             </View>
           ))}
           <View style={s.totalRow} wrap={false}>
-            <Text style={[s.td, s.totalLabel, { width: "80%" }]}>Total</Text>
+            <Text style={[s.td, s.totalLabel, { width: "80%" }]}>{variant === "receipt" ? "Total paid" : "Total"}</Text>
             <Text style={[s.td, s.cellLine, s.num, s.totalValue, { width: COL.amount }]}>{formatNaira(q.total)}</Text>
           </View>
         </View>
@@ -169,8 +184,8 @@ export function QuotationDocument({ q }: { q: QuoteRecord }) {
           </View>
         )}
 
-        {/* Payment details and signature: fixed, always kept together on one page */}
-        <View wrap={false}>
+        {/* Payment details and signature: fixed, always kept together on one page. Not on a receipt or a draft. */}
+        {variant === "quotation" && <View wrap={false}>
           <View style={s.payment}>
             <Text style={s.h2}>Payment Details</Text>
             <View style={s.box}>
@@ -187,7 +202,8 @@ export function QuotationDocument({ q }: { q: QuoteRecord }) {
             <View style={s.signLine} />
             <Text style={s.signCaption}>{COMPANY.signatureLine}</Text>
           </View>
-        </View>
+        </View>}
+        {variant === "receipt" && <Text style={[s.words, { marginTop: 22 }]}>Thank you for your order. Keep this receipt for your records.</Text>}
 
         <Text style={s.footer} fixed>{q.quoteNumber}</Text>
       </Page>
@@ -195,6 +211,6 @@ export function QuotationDocument({ q }: { q: QuoteRecord }) {
   );
 }
 
-export async function renderQuotationPdf(q: QuoteRecord): Promise<Buffer> {
-  return renderToBuffer(<QuotationDocument q={q} />);
+export async function renderQuotationPdf(q: DocData, variant: DocVariant = "quotation"): Promise<Buffer> {
+  return renderToBuffer(<QuotationDocument q={q} variant={variant} />);
 }

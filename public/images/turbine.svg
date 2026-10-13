@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 400" role="img" aria-label="Wind turbine and solar panel">
+  <rect width="500" height="400" fill="#e7f4eb"/>
+  <circle cx="390" cy="88" r="38" fill="#f6c453"/>
+  <path d="M0 330 Q120 300 250 322 T500 312 V400 H0z" fill="#35a65a" opacity=".35"/>
+  <path d="M0 352 Q140 330 270 350 T500 340 V400 H0z" fill="#0c5c2e" opacity=".55"/>
+  <g stroke="#0c4a23" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <path d="M196 340 L206 150 L216 340" stroke-width="5" fill="#ffffff"/>
+    <circle cx="206" cy="146" r="9" fill="#0c4a23"/>
+    <path d="M206 146 L206 52" stroke-width="7"/>
+    <path d="M206 146 L288 193" stroke-width="7"/>
+    <path d="M206 146 L124 193" stroke-width="7"/>
+  </g>
+  <g transform="translate(300 262)">
+    <path d="M0 40 L36 0 H132 L96 40z" fill="#0c5c2e"/>
+    <path d="M24 13 H120 M12 27 H108 M60 0 L40 40 M96 0 L72 40" stroke="#e7f4eb" stroke-width="2"/>
+    <path d="M48 40 V66 M84 40 V66" stroke="#0c4a23" stroke-width="5" stroke-linecap="round"/>
+  </g>
+</svg>

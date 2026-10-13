@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cart drawer</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Manrope:wght@500;700;800&amp;display=swap" rel="stylesheet" data-dc-tpl="1">
+<style>
+:root{--color-bg:#f7f8f3;--color-text:#17231c;--color-muted-strong:#4a574f;--color-border:#d8dad5;--color-primary:#0c5c2e;--color-forest:#0c4a23;--color-leaf:#35a65a;--color-primary-soft:#e7f4eb;--color-danger:#a02222;--color-danger-bg:#fde5e5;--font-head:'Manrope',system-ui,sans-serif;--font-body:'Inter',system-ui,sans-serif;--radius-pill:999px;--shadow-float:0 10px 30px rgba(23,35,28,.16)}
+body{margin:0;background:#cfd6d0}
+.drawer{width:100%;max-width:440px;height:800px;display:flex;flex-direction:column;background:#fff;color:var(--color-text);font-family:var(--font-body);font-size:15px;line-height:1.5;box-shadow:var(--shadow-float)}
+.drawer *,.drawer *::before,.drawer *::after{box-sizing:border-box}
+.drawer :is(h2,h3,p,ul){margin:0}
+.drawer a,.drawer button{font-family:inherit}
+.drawer a:focus-visible,.drawer button:focus-visible,.drawer input:focus-visible{outline:2px solid var(--color-text);outline-offset:2px}
+.icon{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.sprite{position:absolute;width:0;height:0;overflow:hidden}
+.drawer__head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 8px 8px 20px;border-bottom:1px solid var(--color-border)}
+.drawer__title{font:800 20px var(--font-head);letter-spacing:-.02em}
+.drawer__close{width:44px;height:44px;display:grid;place-items:center;border:0;background:none;border-radius:50%;cursor:pointer;color:var(--color-text)}
+.drawer__close:hover{background:var(--color-primary-soft)}
+.added{display:flex;align-items:center;gap:10px;margin:12px 16px 0;padding:10px 14px;border-radius:12px;background:var(--color-primary-soft);color:var(--color-forest);font-size:14px;font-weight:600}
+.added__tick{width:24px;height:24px;border-radius:50%;background:var(--color-primary);color:#fff;display:grid;place-items:center;flex:none}
+.added__tick .icon{width:14px;height:14px;stroke-width:2.2}
+.drawer__list{list-style:none;padding:12px 16px;margin:0;flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:12px}
+.dline{display:grid;grid-template-columns:56px minmax(0,1fr) auto;gap:4px 12px;padding-bottom:12px;border-bottom:1px solid #edefe9}
+.dline__thumb{grid-row:1 / span 2;width:56px;height:56px;border-radius:10px;border:1px solid #edefe9;display:grid;place-items:center;color:#9db8a6}
+.dline__thumb svg{width:30px;height:30px;fill:none;stroke:currentColor;stroke-width:1.1;stroke-linecap:round;stroke-linejoin:round}
+.dline__name{font:600 14px/1.35 var(--font-body)}
+.dline__sub{font-size:13px;color:var(--color-muted-strong)}
+.dline__total{font:700 15px var(--font-body);color:var(--color-primary);font-variant-numeric:tabular-nums;text-align:right}
+.dline__ctrl{grid-column:2 / span 2;display:flex;align-items:center;justify-content:space-between}
+.dstep{display:inline-flex;align-items:center;border:1px solid #8a968e;border-radius:999px}
+.dstep button{width:44px;height:44px;display:grid;place-items:center;border:0;background:none;border-radius:50%;color:var(--color-primary);cursor:pointer}
+.dstep span{min-width:28px;text-align:center;font-weight:600}
+.dline__rm{min-height:44px;padding:0 10px;border:0;background:none;border-radius:999px;color:var(--color-danger);font:600 13px var(--font-body);cursor:pointer}
+.dline--kit{background:var(--color-primary-soft);border:1.5px solid var(--color-primary);border-radius:12px;padding:12px}
+.dline--kit .dline__thumb{background:#fff;color:var(--color-primary);border-color:transparent}
+.dline--kit .dline__thumb svg{stroke-width:1.5}
+.drawer__foot{padding:14px 16px 16px;border-top:1px solid var(--color-border);display:flex;flex-direction:column;gap:10px;background:#fff}
+.sum{display:flex;justify-content:space-between;font-size:14px;color:var(--color-muted-strong)}
+.sum--total{padding-top:8px;border-top:1px solid #edefe9;font-size:16px;color:var(--color-text);font-weight:700}
+.sum--total b{font-size:20px;color:var(--color-primary);font-variant-numeric:tabular-nums}
+.note{font-size:12.5px;color:var(--color-muted-strong)}
+.btn{display:flex;align-items:center;justify-content:center;min-height:48px;border-radius:999px;border:1.5px solid transparent;font:600 15px var(--font-body);text-decoration:none;cursor:pointer}
+.btn--primary{background:var(--color-primary);color:#fff}.btn--primary:hover{background:var(--color-forest)}
+.btn--secondary{background:#fff;border-color:var(--color-primary);color:var(--color-primary)}
+.btn--text{background:none;color:var(--color-primary);text-decoration:underline;text-underline-offset:3px;min-height:44px}
+.component{position:relative;height:auto}
+#root,#root>.component{height:auto}
+</style>
+</head>
+<body>
+
+<div id="root"><div class="component"><aside class="drawer" aria-label="Cart"><svg class="sprite" aria-hidden="true" focusable="false"><defs><symbol id="i-box" viewBox="0 0 24 24"><path d="M3 7.5L12 3l9 4.5v9L12 21l-9-4.5z"></path><path d="M3 7.5l9 4.5 9-4.5M12 12v9"></path></symbol><symbol id="i-board" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="1.5"></rect><path d="M9 3v3M12 3v3M15 3v3M9 18v3M12 18v3M15 18v3M3 9h3M3 12h3M3 15h3M18 9h3M18 12h3M18 15h3"></path></symbol><symbol id="i-sensor" viewBox="0 0 24 24"><circle cx="12" cy="15" r="1.6"></circle><path d="M7.5 15a4.5 4.5 0 0 1 9 0M4.5 15a7.5 7.5 0 0 1 15 0M12 7V4"></path></symbol></defs></svg><div class="drawer__head"><h2 class="drawer__title">Your cart (3)</h2><button class="drawer__close" type="button" aria-label="Close cart"><svg class="icon" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button></div><p class="added" role="status"><span class="added__tick"><svg class="icon" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></span>Added to cart</p><ul class="drawer__list"><li class="dline dline--kit"><span class="dline__thumb"><svg aria-hidden="true"><use href="#i-box"></use></svg></span><div><p class="dline__name">Solar phone charger kit</p><p class="dline__sub">7 components · complete kit</p></div><p class="dline__total">₦25,800</p><div class="dline__ctrl"><div class="dstep" role="group" aria-label="Kit quantity"><button type="button" aria-label="Fewer kits"><svg class="icon" aria-hidden="true"><path d="M5 12h14"></path></svg></button><span>1</span><button type="button" aria-label="More kits"><svg class="icon" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg></button></div><button class="dline__rm" type="button">Remove</button></div></li><li class="dline"><span class="dline__thumb"><svg aria-hidden="true"><use href="#i-board"></use></svg></span><div><p class="dline__name">ESP32 DevKit V1 (WiFi + Bluetooth)</p><p class="dline__sub">₦9,800 each</p></div><p class="dline__total">₦9,800</p><div class="dline__ctrl"><div class="dstep" role="group" aria-label="Quantity of ESP32 DevKit"><button type="button" aria-label="Decrease"><svg class="icon" aria-hidden="true"><path d="M5 12h14"></path></svg></button><span>1</span><button type="button" aria-label="Increase"><svg class="icon" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg></button></div><button class="dline__rm" type="button">Remove</button></div></li><li class="dline"><span class="dline__thumb"><svg aria-hidden="true"><use href="#i-sensor"></use></svg></span><div><p class="dline__name">HC-SR04 Ultrasonic Distance Sensor</p><p class="dline__sub">₦2,200 each</p></div><p class="dline__total">₦2,200</p><div class="dline__ctrl"><div class="dstep" role="group" aria-label="Quantity of HC-SR04"><button type="button" aria-label="Decrease"><svg class="icon" aria-hidden="true"><path d="M5 12h14"></path></svg></button><span>1</span><button type="button" aria-label="Increase"><svg class="icon" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg></button></div><button class="dline__rm" type="button">Remove</button></div></li></ul><div class="drawer__foot"><div class="sum"><span>Subtotal</span><span>₦37,800</span></div><div class="sum"><span>Delivery</span><span>Free (Minna)</span></div><div class="sum sum--total"><span>Total</span><b>₦37,800</b></div><p class="note">Prices can change until you pay. Your price is locked when you check out.</p><a class="btn btn--primary" href="Checkout.html">Checkout</a><a class="btn btn--secondary" href="Quote.html">Request a quote instead</a><a class="btn btn--text" href="Shop.html">Continue shopping</a></div></aside></div></div>
+
+
+
+
+</body>
+</html>

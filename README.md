@@ -1,6 +1,56 @@
-# Green Corner Quote Tool
+# Waste2Light Store
 
-Internal Waste2Light tool that turns a list of components into a priced quote. It reads Microscale prices twice a day, adds a per-item markup (10% default) and totals the quote. Built from the PRD dated 2 Oct 2026.
+The components and kits branch of Waste2Light: a public store where students, schools and makers buy electronics and renewable-energy parts or complete project kits, pay online (Paystack) or by bank transfer, or send a quote request, with delivery or pickup in Minna. Behind it, an admin area runs orders, quote requests, quotations, products, stock and projects. The original internal quote tool (Microscale sync, Catalog, quote builder, quotation PDF) lives on inside the admin area.
+
+Plan and decisions: the "Waste2Light Components Platform: Plan" document. Design: `UI-UX.md` (brief) and `Designs/` (the Claude Design export the pages are built from).
+
+## The store (public)
+
+| Page | Path |
+| --- | --- |
+| Home | `/` |
+| Shop, with category, stock and price filters and sorting | `/shop` |
+| Product (photos, description, price, stock, buy) | `/shop/<id>-<name>` |
+| Projects and project kits (buy the kit, buy some parts, request a quote for a class) | `/projects`, `/projects/<slug>` |
+| Cart (also a drawer on every page) | `/cart` |
+| Checkout: guest or account, delivery in Minna or pickup, Paystack or bank transfer | `/checkout` |
+| Order confirmation, receipt PDF, order tracking | `/checkout/success/<number>`, `/track` |
+| Request a quote (from the cart, a product or a project), with a draft PDF | `/quote-request` |
+| A sent quotation: view, accept and pay | `/quotation/<private link>` |
+| Account: orders, quotes, addresses, profile, password reset | `/account` |
+| About, Contact, Delivery, Refunds, Terms, Privacy, Cookies | `/about` and so on |
+
+- **Prices.** Customers see one price: Microscale price ÷ units per pack × (1 + markup), whole naira. The markup is set per product in Admin > Products, else on the Catalog component, else the default in Admin > Settings (10%). The supplier's name, price, links, stock codes and image addresses never reach a public page: photos are served from `/img/p/<id>/<n>`, descriptions are cleaned (`src/lib/sanitize.ts`).
+- **Stock.** Out-of-stock products are hidden by default but can be shown. What Waste2Light holds itself (Admin > Stock) makes a product buyable even when Microscale is out; paid orders take from it first.
+- **Orders.** Prices are locked when the order is placed. The cart is emptied only once the payment is confirmed, so a failed payment loses nothing. Order numbers are `W2L-ORD-1001` onwards; quote requests `W2L-REQ-0001` onwards.
+- **Payments.** Paystack: the customer pays on Paystack's page; the order is marked paid only after our server verifies the transaction with Paystack (return page and signed webhook both do this, once). Bank transfer: the order waits until staff click *Mark as paid*. Refunds go back through Paystack's API, or are recorded as manual bank refunds.
+- **Notifications.** New paid orders, bank-transfer orders and quote requests: an alert in the admin bell, an email to the team and, if connected, WhatsApp. Customers get emails for confirmation, receipts (PDF attached), status changes, refunds and quotations. Every message is logged (Admin > Activity); if email or WhatsApp is not set up, nothing breaks and the log says "Not set up".
+- **Protecting the catalog.** No product feed is exposed; the shop shows 48 products a page. Shop pages and search are rate-limited per visitor (90 a minute, 1,200 an hour); known copying tools and AI crawlers are refused (`src/lib/guard.ts`, `src/proxy.ts`, `src/app/robots.ts`); owners can block addresses in Admin > Traffic. This slows copying a lot; it cannot stop a determined person completely.
+
+## The admin area (`/admin`)
+
+Dashboard (sales, orders to confirm, open requests, items to source, sync health, needs-attention list, 30-day chart), Orders (status steps, mark paid, refunds, unavailable items, our price vs Microscale price and margin, CSV export), Quote requests (call/WhatsApp, notes, make the quotation, email it), Quotations (the existing builder and PDF, plus *Email to customer*), Products (markup, visibility, our stock), Stock, Projects (editor with photos, steps, downloads, kit list and live kit price; *Add demo projects*), Customers, Sync, Settings (store settings and connection status), Staff (owner only: invite, roles), Activity (audit log and every email/WhatsApp), Traffic, and the older quote tools (Quote shop, Catalog, Bundles).
+
+Roles: **Owner** (everything) and **Staff** (orders, quote requests, projects, stock; no prices, refunds or staff). The owner in `ADMIN_EMAIL`/`ADMIN_PASSWORD_HASH` always works; invite everyone else from Admin > Staff (they set their own password from the invitation link).
+
+## Going live with the platform
+
+1. **Migrate Neon first**: `$env:DATABASE_URL='postgresql://...'; npm run migrate` applies `004_platform.sql` (new tables; existing data untouched).
+2. **Vercel environment variables** (see `.env.example`): `SITE_URL` (the store's address), Paystack keys, `RESEND_API_KEY` + `MAIL_FROM` (domain verified in Resend), optionally WhatsApp. Redeploy.
+3. **Paystack dashboard**: set the webhook URL to `<SITE_URL>/api/paystack/webhook` and the callback URL to `<SITE_URL>/checkout/callback`. Test with test keys first, then swap in live keys.
+4. **Admin > Settings**: alert emails and WhatsApp numbers, default markup, bank transfer on or off, opening hours.
+5. **Admin > Projects**: *Add demo projects* (or `npm run seed-demo`), then replace them with real ones.
+6. Run the sync workflow once with *force* so product descriptions and photos fill in.
+
+## Updating the design
+
+The stylesheets `src/styles/store.css` and `src/styles/admin.css` are generated from `Designs/*.html`: `node scripts/design-css.mjs Designs src/styles/store.css store` (and `... admin.css admin`). Rules every page writes the same way stay global; rules a page styles its own way are scoped to that page with `:where(.pg-<page>)`, keeping each page's original order. `src/styles/app.css` holds what the static designs did not need (overlays, live states, pages without a mockup).
+
+---
+
+# The quote tools (admin)
+
+Originally the internal Green Corner quote tool: it turns a list of components into a priced quote. It reads Microscale prices twice a day, adds a per-item markup (10% default) and totals the quote. Built from the PRD dated 2 Oct 2026. Its pages now live under `/admin` (Quote shop, Catalog, Bundles, Quotations, Sync, Settings).
 
 ## Scope: v1 is Microscale only
 

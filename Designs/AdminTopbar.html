@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Admin top bar</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Manrope:wght@500;700;800&amp;display=swap" rel="stylesheet" data-dc-tpl="1">
+<style>
+:root{--color-bg:#f7f8f3;--color-text:#17231c;--color-muted-strong:#4a574f;--color-primary:#0c5c2e;--color-forest:#0c4a23;--color-sun:#f6c453;--color-primary-soft:#e7f4eb;--color-border:#d8dad5;--color-warn:#8a5a00;--color-warn-bg:#fdf0d4;--color-danger:#a02222;--color-danger-bg:#fde5e5;--font-head:'Manrope',system-ui,sans-serif;--font-body:'Inter',system-ui,sans-serif}
+body{margin:0}
+.top{position:relative;z-index:20;display:flex;align-items:center;gap:16px;min-height:72px;padding:0 24px;background:#fff;border-bottom:1px solid var(--color-border);font-family:var(--font-body);color:var(--color-text)}
+.top *,.top *::before,.top *::after{box-sizing:border-box}
+.top :is(ul,p){margin:0}
+.top a:focus-visible,.top button:focus-visible,.top input:focus-visible{outline:2px solid var(--color-text);outline-offset:2px}
+.icon{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.search{display:flex;align-items:center;gap:10px;flex:1;max-width:520px;min-height:44px;padding:0 16px;background:var(--color-bg);border:1px solid var(--color-border);border-radius:999px;color:var(--color-muted-strong)}
+.search:focus-within{background:#fff;border-color:var(--color-primary)}
+.search input{flex:1;min-width:0;border:0;outline:0;background:none;font:400 15px var(--font-body);color:var(--color-text)}
+.search kbd{font:600 11px var(--font-body);padding:2px 6px;border:1px solid var(--color-border);border-radius:6px;background:#fff}
+.right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.bell{position:relative}
+.bell__btn{position:relative;width:44px;height:44px;display:grid;place-items:center;border:0;background:none;border-radius:50%;cursor:pointer;color:var(--color-text)}
+.bell__btn:hover{background:var(--color-primary-soft)}
+.bell__count{position:absolute;top:3px;right:1px;min-width:20px;height:20px;padding:0 5px;border-radius:10px;background:var(--color-danger);color:#fff;font:700 11px/20px var(--font-body);text-align:center}
+.menu{position:absolute;right:0;top:calc(100% + 8px);width:380px;max-width:calc(100vw - 32px);background:#fff;border:1px solid var(--color-border);border-radius:16px;box-shadow:0 14px 40px rgba(23,35,28,.2);overflow:hidden}
+.menu__head{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid #edefe9}
+.menu__title{margin:0;font:800 16px var(--font-head)}
+.menu__mark{border:0;background:none;color:var(--color-primary);font:600 13px var(--font-body);cursor:pointer;min-height:44px;padding:0 6px;text-decoration:underline;text-underline-offset:3px}
+.note{list-style:none;padding:0;margin:0}
+.note li a{display:grid;grid-template-columns:12px minmax(0,1fr);gap:12px;padding:14px 18px;border-bottom:1px solid #edefe9;color:var(--color-text);text-decoration:none}
+.note li a:hover{background:#f7faf7}
+.note__dot{width:10px;height:10px;border-radius:50%;margin-top:6px;background:var(--color-primary)}
+.note__dot--read{background:transparent;border:1.5px solid #b9c2bb}
+.note__title{font:600 14px var(--font-body)}
+.note__text{font-size:13px;color:var(--color-muted-strong)}
+.note__time{font-size:12px;color:var(--color-muted-strong);margin-top:2px}
+.note__warn{color:var(--color-warn);font-weight:700}
+.menu__foot{display:block;padding:12px 18px;text-align:center;font:600 14px var(--font-body);color:var(--color-primary)}
+.user{display:flex;align-items:center;gap:10px;min-height:44px;padding:0 8px 0 4px;border:0;border-radius:999px;background:none;cursor:pointer;color:var(--color-text);font-family:var(--font-body)}
+.user:hover{background:var(--color-primary-soft)}
+.user__av{width:36px;height:36px;border-radius:50%;background:var(--color-forest);color:#fff;display:grid;place-items:center;font:700 13px var(--font-body)}
+.user__name{font:600 14px/1.2 var(--font-body);text-align:left}
+.user__role{display:block;font:500 12px var(--font-body);color:var(--color-muted-strong)}
+@media(max-width:760px){.top{padding:0 12px;gap:8px}.user__name{display:none}.search kbd{display:none}.menu{position:fixed;left:12px;right:12px;top:76px;width:auto;max-width:none}}
+.component{position:relative;height:auto}
+#root,#root>.component{height:auto}
+</style>
+</head>
+<body>
+
+<div id="root"><div class="component"><header class="top"><form class="search" role="search"><svg class="icon" aria-hidden="true"><circle cx="11" cy="11" r="6.5"></circle><path d="M16 16l4.5 4.5"></path></svg><label class="sr-only" for="adm-q">Search orders, customers and products</label><input id="adm-q" type="search" placeholder="Search orders, customers, products"><kbd>/</kbd></form><div class="right"><div class="bell"><button class="bell__btn" type="button" aria-label="Notifications, 3 unread" aria-expanded="false"><svg class="icon" aria-hidden="true"><path d="M6 17V11a6 6 0 0 1 12 0v6l1.5 2h-15zM10 21h4"></path></svg><span class="bell__count">3</span></button></div><button class="user" type="button" aria-label="Account menu, Ibrahim Danladi, Owner"><span class="user__av">ID</span><span class="user__name">Ibrahim Danladi<span class="user__role">Owner</span></span><svg class="icon" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg></button></div></header></div></div>
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Product: phone</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Manrope:wght@500;700;800&amp;display=swap" rel="stylesheet" data-dc-tpl="1">
+<style>
+body{margin:0}
+:root{--color-bg:#f7f8f3;--color-surface:#fff;--color-text:#17231c;--color-muted:#66736b;--color-muted-strong:#4a574f;--color-border:#d8dad5;--color-primary:#0c5c2e;--color-forest:#0c4a23;--color-leaf:#35a65a;--color-sun:#f6c453;--color-primary-soft:#e7f4eb;--color-warn:#8a5a00;--color-warn-bg:#fdf0d4;--color-danger:#a02222;--color-danger-bg:#fde5e5;--font-head:'Manrope',system-ui,sans-serif;--font-body:'Inter',system-ui,sans-serif;--radius-sm:8px;--radius-md:12px;--radius-lg:20px;--radius-pill:999px;--shadow-float:0 10px 30px rgba(23,35,28,.16)}
+body{margin:0}
+.w2l{font-family:var(--font-body);font-size:16px;line-height:1.5;color:var(--color-text);background:var(--color-bg)}
+.w2l *,.w2l *::before,.w2l *::after{box-sizing:border-box}
+.w2l :is(h1,h2,h3,h4){font-family:var(--font-head);letter-spacing:-.02em;line-height:1.15;margin:0}
+.w2l p,.w2l ul,.w2l ol,.w2l dl,.w2l dd{margin:0}
+:where(.w2l) a{color:var(--color-primary)}
+.sprite{position:absolute;width:0;height:0;overflow:hidden}
+.icon{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.container{max-width:1200px;margin:0 auto;padding:0 24px}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 22px;border-radius:var(--radius-pill);border:1.5px solid transparent;font:600 15px/1 var(--font-body);text-decoration:none;cursor:pointer;white-space:nowrap;transition:background .15s,color .15s,border-color .15s}
+.btn:focus-visible,a:focus-visible,button:focus-visible,input:focus-visible{outline:2px solid var(--color-text);outline-offset:2px}
+.btn--primary{background:var(--color-primary);color:#fff}.btn--primary:hover{background:var(--color-forest)}
+.btn--secondary{background:#fff;border-color:var(--color-primary);color:var(--color-primary)}.btn--secondary:hover{background:var(--color-primary-soft)}
+.btn--text{background:none;color:var(--color-primary);text-decoration:underline;text-underline-offset:3px;padding:0 6px}
+.btn--lg{min-height:52px;padding:0 28px;font-size:16px}
+.btn--block{width:100%}
+.btn[disabled]{background:#e9ebe6;color:#56625a;cursor:not-allowed}
+.badge{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:var(--radius-pill);font:600 12px/1.4 var(--font-body);white-space:nowrap}
+.badge::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.badge--in{background:var(--color-primary-soft);color:var(--color-primary)}.badge--in::before{background:var(--color-leaf)}
+.badge--low{background:var(--color-warn-bg);color:var(--color-warn)}
+.badge--out{background:var(--color-danger-bg);color:var(--color-danger)}
+.chip{display:inline-flex;align-items:center;padding:3px 12px;border-radius:var(--radius-pill);border:1px solid var(--color-border);background:#fff;font:500 13px/1.5 var(--font-body)}
+.price{font-family:var(--font-body);font-weight:700;color:var(--color-primary);font-variant-numeric:tabular-nums}
+.photo{display:grid;align-items:end;justify-items:start;padding:16px;border-radius:16px;background:repeating-linear-gradient(135deg,#dbeadf 0 14px,#d0e3d6 14px 28px);color:var(--color-muted-strong);font:500 13px/1.4 var(--font-body)}
+.stepper{display:inline-flex;align-items:center;border:1px solid #8a968e;border-radius:var(--radius-pill);background:#fff}
+.stepper__btn{width:44px;height:44px;display:grid;place-items:center;border:0;background:none;border-radius:50%;color:var(--color-primary);cursor:pointer}
+.stepper__btn:hover:not([disabled]){background:var(--color-primary-soft)}
+.stepper__btn[disabled]{color:#8a968e;cursor:not-allowed}
+.stepper__input{width:56px;height:44px;border:0;background:none;text-align:center;font:600 16px var(--font-body);color:var(--color-text);font-variant-numeric:tabular-nums}
+.product-card{display:flex;flex-direction:column;background:#fff;border:1px solid var(--color-border);border-radius:var(--radius-md);overflow:hidden}
+.product-card:hover{box-shadow:var(--shadow-float)}
+.product-card__media{display:grid;place-items:center;aspect-ratio:1/1;background:#fff;border-bottom:1px solid #edefe9;color:#9db8a6}
+.product-card__glyph{width:64px;height:64px;fill:none;stroke:currentColor;stroke-width:1;stroke-linecap:round;stroke-linejoin:round}
+.product-card__body{display:flex;flex-direction:column;gap:10px;padding:14px;flex:1}
+.product-card__title{font:500 14px/1.4 var(--font-body);letter-spacing:0;min-height:40px}
+.product-card__title a{color:var(--color-text);text-decoration:none}.product-card__title a:hover{text-decoration:underline}
+.product-card__meta{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-top:auto}
+.product-card__price{font-size:18px}
+.project-card{display:flex;flex-direction:column;background:#fff;border:1px solid var(--color-border);border-radius:var(--radius-md);overflow:hidden}
+.project-card__media{aspect-ratio:4/3;border-radius:0}
+.project-card__body{display:flex;flex-direction:column;gap:8px;padding:16px;flex:1}
+.project-card__chips{display:flex;gap:8px;flex-wrap:wrap}
+.project-card__title{font-size:18px;font-weight:700}
+.project-card__title a{color:var(--color-text);text-decoration:none}.project-card__title a:hover{text-decoration:underline}
+.project-card__kit{margin-top:auto;font-size:13px;color:var(--color-muted-strong)}
+/* pdp */
+.crumbs{padding:20px 0 12px;font-size:14px;color:var(--color-muted-strong)}
+.crumbs ol{list-style:none;padding:0;display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.crumbs a{color:var(--color-muted-strong)}
+.crumbs li+li::before{content:"›";margin-right:6px;color:var(--color-muted)}
+.pdp{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(420px,100%),1fr));gap:48px;align-items:start;padding-bottom:56px}
+.gallery{display:flex;flex-direction:column;gap:12px}
+.gallery__main{position:relative;display:grid;place-items:center;aspect-ratio:1/1;background:#fff;border:1px solid var(--color-border);border-radius:16px;color:#9db8a6}
+.gallery__glyph{width:38%;height:38%;fill:none;stroke:currentColor;stroke-width:.6;stroke-linecap:round;stroke-linejoin:round}
+.gallery__zoom{position:absolute;right:12px;bottom:12px;display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 14px;border:1px solid var(--color-border);border-radius:var(--radius-pill);background:#fff;color:var(--color-text);font:600 13px var(--font-body);cursor:pointer}
+.gallery__note{position:absolute;left:14px;top:12px;font:500 12px var(--font-body);color:var(--color-muted-strong)}
+.gallery__thumbs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.gallery__thumb{aspect-ratio:1/1;background:#fff;border:1px solid var(--color-border);border-radius:var(--radius-md);display:grid;place-items:center;color:#9db8a6;cursor:pointer;padding:0}
+.gallery__thumb--on{border:2px solid var(--color-primary)}
+.gallery__thumb .product-card__glyph{width:44%;height:44%}
+.buy{display:flex;flex-direction:column;gap:20px}
+.buy__title{font-size:clamp(26px,3vw,34px);font-weight:800}
+.buy__price-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.buy__price{font-size:36px;line-height:1}
+.buy__qty{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.buy__label{font:600 14px var(--font-body)}
+.buy__actions{display:flex;flex-direction:column;gap:12px}
+.buy__actions-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(200px,100%),1fr));gap:12px}
+.buy__quote{align-self:flex-start}
+.alert{display:flex;gap:12px;padding:14px 16px;border-radius:var(--radius-md);font-size:14px}
+.alert--out{background:var(--color-danger-bg);color:#6e1616}
+.alert .icon{margin-top:2px}
+.trust{list-style:none;padding:20px 0 0;margin:0;border-top:1px solid var(--color-border);display:grid;gap:12px}
+.trust li{display:flex;align-items:center;gap:12px;font-size:14px;color:var(--color-muted-strong)}
+.trust .icon{color:var(--color-primary);width:22px;height:22px}
+.desc{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(380px,100%),1fr));gap:48px;padding:48px 0;border-top:1px solid var(--color-border)}
+.desc h2{font-size:24px;font-weight:800;margin-bottom:14px}
+.desc p{color:var(--color-muted-strong);line-height:1.7;max-width:62ch}
+.specs{display:grid;grid-template-columns:auto 1fr;gap:0;border:1px solid var(--color-border);border-radius:var(--radius-md);background:#fff;overflow:hidden}
+.specs dt,.specs dd{padding:12px 16px;border-top:1px solid #edefe9;font-size:14px}
+.specs dt:first-of-type,.specs dt:first-of-type+dd{border-top:0}
+.specs dt{color:var(--color-muted-strong);font-weight:500}
+.specs dd{font-weight:600;font-variant-numeric:tabular-nums}
+.band{padding:40px 0 56px;border-top:1px solid var(--color-border)}
+.band__title{font-size:24px;font-weight:800;margin-bottom:20px}
+.grid-4{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(230px,100%),1fr));gap:16px}
+.sticky-bar{display:none}
+@media(max-width:760px){.container{padding:0 16px}.pdp{gap:24px}.buy__price{font-size:30px}.sticky-bar{position:fixed;left:0;right:0;bottom:0;z-index:10;display:flex;align-items:center;gap:12px;padding:10px 16px;background:#fff;border-top:1px solid var(--color-border);box-shadow:0 -6px 20px rgba(23,35,28,.1)}.sticky-bar__price{font-size:20px}.sticky-bar .btn{flex:1}.product-page-end{height:76px}.grid-4{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.band .grid-4.projects{grid-template-columns:minmax(0,1fr)}.buy__actions .btn--lg{min-height:48px}.desc{gap:32px;padding:32px 0}}
+:root{--color-bg:#f7f8f3;--color-text:#17231c;--color-muted:#66736b;--color-border:#d8dad5;--color-primary:#0c5c2e;--color-forest:#0c4a23;--color-primary-soft:#e7f4eb;--font-head:'Manrope',system-ui,sans-serif;--font-body:'Inter',system-ui,sans-serif}
+body{margin:0}
+.site-header{font-family:var(--font-body);color:var(--color-text);background:#fff;border-bottom:1px solid var(--color-border)}
+.site-header *,.site-header *::before,.site-header *::after{box-sizing:border-box}
+.site-header a{color:inherit}
+.site-header a:focus-visible,.site-header button:focus-visible,.site-header input:focus-visible{outline:2px solid var(--color-text);outline-offset:2px}
+.icon{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.skip-link{position:absolute;left:8px;top:-60px;background:var(--color-forest);color:#fff;padding:10px 16px;border-radius:8px;z-index:5;font:600 14px var(--font-body);text-decoration:none}
+.skip-link:focus{top:8px}
+.strip{background:var(--color-primary-soft);color:var(--color-forest);font-size:13px}
+.strip__in{position:relative;max-width:1200px;margin:0 auto;padding:0 56px;min-height:40px;display:flex;align-items:center;justify-content:center;text-align:center}
+.strip__close{position:absolute;right:6px;top:0;width:44px;height:40px;display:grid;place-items:center;border:0;background:none;color:var(--color-forest);cursor:pointer;border-radius:50%}
+.strip__close .icon{width:16px;height:16px}
+.bar{max-width:1200px;margin:0 auto;padding:0 24px;min-height:72px;display:flex;align-items:center;gap:20px}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.logo__mark{width:34px;height:34px;color:var(--color-primary)}
+.logo__word{font:800 20px/1 var(--font-head);letter-spacing:-.02em}
+.logo__word b{color:var(--color-primary);font-weight:800}
+.logo__tag{font:600 11px/1 var(--font-body);letter-spacing:.08em;text-transform:uppercase;background:var(--color-primary-soft);color:var(--color-primary);padding:5px 8px;border-radius:999px}
+.nav{display:flex;gap:2px;margin:0 auto}
+.nav__link{display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border-radius:999px;text-decoration:none;font:500 15px var(--font-body)}
+.nav__link:hover{background:var(--color-primary-soft)}
+.nav__link--active{background:var(--color-primary-soft);color:var(--color-primary);font-weight:600}
+.search{display:flex;align-items:center;gap:8px;width:250px;min-height:44px;padding:0 14px;background:var(--color-bg);border:1px solid var(--color-border);border-radius:999px;color:var(--color-muted)}
+.search:focus-within{border-color:var(--color-primary);background:#fff}
+.search input{flex:1;min-width:0;border:0;outline:0;background:none;font:400 15px var(--font-body);color:var(--color-text)}
+.search input:focus-visible{outline:0}
+.actions{display:flex;align-items:center;gap:2px}
+.icon-btn{position:relative;display:grid;place-items:center;width:44px;height:44px;border:0;background:none;border-radius:50%;color:var(--color-text);cursor:pointer;text-decoration:none}
+.icon-btn:hover{background:var(--color-primary-soft)}
+.icon-btn__badge{position:absolute;top:3px;right:1px;min-width:20px;height:20px;padding:0 5px;border-radius:10px;background:var(--color-primary);color:#fff;font:700 11px/20px var(--font-body);text-align:center}
+.icon-btn--phone{display:none}
+@media(max-width:1000px){.nav,.search,.icon-btn--account{display:none}.icon-btn--phone{display:grid}.bar{gap:4px;padding:0 12px 0 16px}.logo{margin-right:auto}}
+@media(max-width:480px){.logo__tag{display:none}.strip__in{padding:0 48px 0 16px;text-align:left;font-size:12.5px}}
+:root{--color-text:#17231c;--color-primary:#0c5c2e;--color-forest:#0c4a23;--color-leaf:#35a65a;--color-sun:#f6c453;--color-primary-soft:#e7f4eb;--font-head:'Manrope',system-ui,sans-serif;--font-body:'Inter',system-ui,sans-serif}
+body{margin:0}
+.site-footer{position:relative;font-family:var(--font-body);background:var(--color-forest);color:#fff;font-size:15px;line-height:1.6}
+.site-footer *,.site-footer *::before,.site-footer *::after{box-sizing:border-box}
+.site-footer a{color:#dcebe0;text-decoration:none;display:inline-flex;align-items:center;min-height:32px}
+.site-footer a:hover{color:#fff;text-decoration:underline}
+.site-footer a:focus-visible,.site-footer button:focus-visible{outline:2px solid var(--color-sun);outline-offset:2px}
+.icon{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.footer__in{max-width:1200px;margin:0 auto;padding:64px 24px 28px}
+.footer__top{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(200px,100%),1fr));gap:36px}
+.footer__brand{max-width:340px}
+.footer__word{font:800 22px/1 var(--font-head);letter-spacing:-.02em;color:#fff}
+.footer__word b{color:var(--color-sun)}
+.footer__about{margin-top:14px;color:#c9dccf;font-size:14px}
+.footer__heading{font:700 13px var(--font-body);letter-spacing:.08em;text-transform:uppercase;color:var(--color-sun);margin:0 0 12px}
+.footer__list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
+.footer__contact{font-style:normal;margin-top:40px;padding-top:28px;border-top:1px solid rgba(255,255,255,.18);display:grid;grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr));gap:12px 36px;font-size:14px;color:#dcebe0}
+.footer__contact-item{display:flex;gap:10px;align-items:flex-start}
+.footer__contact-item .icon{margin-top:3px;color:var(--color-sun)}
+.footer__pay{margin-top:28px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;color:#dcebe0;font-size:14px}
+.pay-mark{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border:1px solid rgba(255,255,255,.4);border-radius:999px;font:600 12px var(--font-body);color:#fff}
+.footer__bottom{margin-top:28px;padding-top:20px;border-top:1px solid rgba(255,255,255,.18);display:flex;justify-content:space-between;gap:12px 24px;flex-wrap:wrap;font-size:13px;color:#c9dccf}
+.footer__legal{display:flex;gap:20px;flex-wrap:wrap}
+.footer__legal a{min-height:44px}
+.wa-float{position:fixed;right:20px;bottom:20px;z-index:20;display:inline-flex;align-items:center;gap:10px;height:56px;min-width:56px;padding:0 16px;border-radius:999px;background:var(--color-primary);color:#fff !important;box-shadow:0 10px 30px rgba(23,35,28,.28);border:2px solid #fff}
+.wa-float:hover{background:#0a4a25;text-decoration:none !important}
+.wa-float .icon{width:26px;height:26px}
+.wa-float__label{display:none;font:600 14px var(--font-body)}
+.wa-float:hover .wa-float__label,.wa-float:focus-visible .wa-float__label{display:inline}
+@media(max-width:760px){.footer__in{padding:48px 16px 24px}.wa-float{bottom:84px;right:12px}}
+.component{position:relative;height:auto}
+#root,#root>.component{height:auto}
+</style>
+</head>
+<body>
+
+<div id="root"><div class="component"><div><div class="component"><div class="w2l"><svg class="sprite" aria-hidden="true" focusable="false"><defs><symbol id="i-board" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="1.5"></rect><path d="M9 3v3M12 3v3M15 3v3M9 18v3M12 18v3M15 18v3M3 9h3M3 12h3M3 15h3M18 9h3M18 12h3M18 15h3"></path></symbol><symbol id="i-sensor" viewBox="0 0 24 24"><circle cx="12" cy="15" r="1.6"></circle><path d="M7.5 15a4.5 4.5 0 0 1 9 0M4.5 15a7.5 7.5 0 0 1 15 0M12 7V4"></path></symbol><symbol id="i-motor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.5"></circle><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"></path></symbol><symbol id="i-wire" viewBox="0 0 24 24"><circle cx="3.5" cy="8" r="1"></circle><path d="M4.5 8h2c3.5 0 3.5 8 7 8h2.5"></path><circle cx="20.5" cy="16" r="1"></circle></symbol><symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"></path></symbol><symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14"></path></symbol><symbol id="i-truck" viewBox="0 0 24 24"><path d="M3 6h11v10H3zM14 9.5h4l3 3.5v3h-7"></path><circle cx="7" cy="18" r="1.8"></circle><circle cx="17" cy="18" r="1.8"></circle></symbol><symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"></rect><path d="M8 11V8a4 4 0 0 1 8 0v3"></path></symbol><symbol id="i-phone" viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A15 15 0 0 1 3 6a2 2 0 0 1 2-2z"></path></symbol><symbol id="i-zoom" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"></circle><path d="M16 16l4.5 4.5M11 8v6M8 11h6"></path></symbol><symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 4l9 16H3z"></path><path d="M12 10v4M12 17.2v.01"></path></symbol></defs></svg><div class="component"><header class="site-header"><a class="skip-link" href="#main">Skip to content</a><div class="strip"><div class="strip__in"><p>Delivery and pickup in Minna, Niger State. Free delivery on every order.</p><button class="strip__close" type="button" aria-label="Dismiss announcement"><svg class="icon" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button></div></div><div class="bar"><a class="logo" href="index.html" aria-label="Waste2Light Store, home"><svg class="logo__mark" viewBox="0 0 34 34" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="17" cy="15" r="9"></circle><path d="M13 27h8M14.5 30h5"></path><path d="M12 15c0-3 2-5 5-5 0 3-2 5-5 5zM17 15v6"></path></svg><span class="logo__word">Waste<b>2</b>Light</span><span class="logo__tag">Store</span></a><nav aria-label="Main"><div class="nav"><a class="nav__link nav__link--active" href="Shop.html" aria-current="page">Shop</a><a class="nav__link" href="Projects.html">Projects</a><a class="nav__link" href="index.html#schools">For schools</a><a class="nav__link" href="About.html">About</a><a class="nav__link" href="Contact.html">Contact</a></div></nav><form class="search" role="search"><svg class="icon" aria-hidden="true"><circle cx="11" cy="11" r="6.5"></circle><path d="M16 16l4.5 4.5"></path></svg><label class="sr-only" for="hdr-q">Search components</label><input id="hdr-q" type="search" placeholder="Search components"></form><div class="actions"><button class="icon-btn icon-btn--phone" type="button" aria-label="Search"><svg class="icon" aria-hidden="true"><circle cx="11" cy="11" r="6.5"></circle><path d="M16 16l4.5 4.5"></path></svg></button><a class="icon-btn icon-btn--account" href="AccountOrders.html" aria-label="Account"><svg class="icon" aria-hidden="true"><circle cx="12" cy="8" r="3.5"></circle><path d="M5 20c0-3.6 3.1-6 7-6s7 2.4 7 6"></path></svg></a><a class="icon-btn" href="Cart.html" aria-label="Cart, 3 items"><svg class="icon" aria-hidden="true"><path d="M3 4h2l2.4 11.2a1.5 1.5 0 0 0 1.5 1.2h7.7a1.5 1.5 0 0 0 1.5-1.1L20 8H6.2"></path><circle cx="9.5" cy="20" r="1"></circle><circle cx="17" cy="20" r="1"></circle></svg><span class="icon-btn__badge"><span class="sc-interp">3</span></span></a><a class="icon-btn icon-btn--phone" href="MenuM.html" aria-label="Open menu"><svg class="icon" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"></path></svg></a></div></div></header></div><main id="main"><div class="container"><nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="Shop.html">Shop</a></li><li><a href="Shop.html">Microcontrollers and boards</a></li><li aria-current="page">Arduino Uno R3 Compatible Board</li></ol></nav><div class="pdp"><div class="gallery"><div class="gallery__main" role="img" aria-label="Product photo placeholder, Arduino Uno R3 compatible board"><span class="gallery__note">Product photo on white · 800 x 800</span><svg class="gallery__glyph"><use href="#i-board"></use></svg><button class="gallery__zoom" type="button"><svg class="icon" aria-hidden="true"><use href="#i-zoom"></use></svg>Zoom</button></div><div class="gallery__thumbs"><button class="gallery__thumb gallery__thumb--on" type="button" aria-label="Photo 1 of 4, selected"><svg class="product-card__glyph"><use href="#i-board"></use></svg></button><button class="gallery__thumb" type="button" aria-label="Photo 2 of 4"><svg class="product-card__glyph"><use href="#i-board"></use></svg></button><button class="gallery__thumb" type="button" aria-label="Photo 3 of 4"><svg class="product-card__glyph"><use href="#i-board"></use></svg></button><button class="gallery__thumb" type="button" aria-label="Photo 4 of 4"><svg class="product-card__glyph"><use href="#i-board"></use></svg></button></div></div><div class="buy"><h1 class="buy__title">Arduino Uno R3 Compatible Board with USB Cable</h1><div class="buy__price-row"><span class="price buy__price">₦14,500</span><span class="badge badge--in"><span class="sc-interp">In stock</span></span></div><div class="buy__qty"><span class="buy__label" id="qty-label">Quantity</span><div class="stepper" role="group" aria-labelledby="qty-label"><button class="stepper__btn" type="button" aria-label="Decrease quantity"><svg class="icon" aria-hidden="true"><use href="#i-minus"></use></svg></button><input class="stepper__input" type="text" inputmode="numeric" aria-label="Quantity" value="1"><button class="stepper__btn" type="button" aria-label="Increase quantity"><svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg></button></div></div><div class="buy__actions"><div class="buy__actions-row"><button class="btn btn--primary btn--lg btn--block" type="button">Add to cart</button><a class="btn btn--secondary btn--lg btn--block" href="Checkout.html">Buy now</a></div><a class="btn btn--text buy__quote" href="Quote.html">Add to a quote request</a></div><ul class="trust"><li><svg class="icon" aria-hidden="true"><use href="#i-truck"></use></svg>Delivery or pickup in Minna</li><li><svg class="icon" aria-hidden="true"><use href="#i-lock"></use></svg>Secure payment by Paystack</li><li><svg class="icon" aria-hidden="true"><use href="#i-phone"></use></svg>Questions? WhatsApp us</li></ul></div></div><section class="desc" aria-label="Description"><div><h2>About this board</h2><p>A drop-in compatible board for learning and prototyping. It runs on the ATmega328P, works with the Arduino IDE and has the same pin layout as the original, so every tutorial, shield and sketch you find will work. A good first board for the smart dustbin, weather station and line-following robot projects.</p><p>Comes with a USB cable. Power it from a computer, a power bank or a 7 to 12V battery pack.</p></div><div><h2>Specifications</h2><dl class="specs"><dt>Microcontroller</dt><dd>ATmega328P</dd><dt>Operating voltage</dt><dd>5V</dd><dt>Digital pins</dt><dd>14 (6 with PWM)</dd><dt>Analog inputs</dt><dd>6</dd><dt>Flash memory</dt><dd>32KB</dd><dt>Clock speed</dt><dd>16MHz</dd></dl></div></section><section class="band" aria-labelledby="used-title"><h2 class="band__title" id="used-title">Used in these projects</h2><div class="grid-4 projects"><article class="project-card"><div class="project-card__media photo" role="img" aria-label="Photo placeholder">Photo · 4:3</div><div class="project-card__body"><div class="project-card__chips"><span class="chip">Intermediate</span><span class="chip">Secondary</span></div><h3 class="project-card__title"><a href="Project.html">Smart dustbin</a></h3><p class="project-card__kit">Kit from <span class="price">₦25,100</span></p></div></article><article class="project-card"><div class="project-card__media photo" role="img" aria-label="Photo placeholder">Photo · 4:3</div><div class="project-card__body"><div class="project-card__chips"><span class="chip">Intermediate</span><span class="chip">University</span></div><h3 class="project-card__title"><a href="Project.html">Weather station</a></h3><p class="project-card__kit">Kit from <span class="price">₦32,000</span></p></div></article></div></section><section class="band" aria-labelledby="also-title"><h2 class="band__title" id="also-title">You may also need</h2><div class="grid-4"><article class="product-card"><a class="product-card__media" href="Product.html" tabindex="-1" aria-hidden="true"><svg class="product-card__glyph"><use href="#i-board"></use></svg></a><div class="product-card__body"><h3 class="product-card__title"><a href="Product.html"><span class="sc-interp">830-Point Solderless Breadboard</span></a></h3><div class="product-card__meta"><span class="price product-card__price"><span class="sc-interp">₦3,500</span></span><span class="badge badge--in"><span class="sc-interp">In stock</span></span></div><button class="btn btn--primary btn--block" type="button">Add to cart</button></div></article><article class="product-card"><a class="product-card__media" href="Product.html" tabindex="-1" aria-hidden="true"><svg class="product-card__glyph"><use href="#i-wire"></use></svg></a><div class="product-card__body"><h3 class="product-card__title"><a href="Product.html"><span class="sc-interp">Jumper Wire Kit, 120 pcs</span></a></h3><div class="product-card__meta"><span class="price product-card__price"><span class="sc-interp">₦3,800</span></span><span class="badge badge--in"><span class="sc-interp">In stock</span></span></div><button class="btn btn--primary btn--block" type="button">Add to cart</button></div></article><article class="product-card"><a class="product-card__media" href="Product.html" tabindex="-1" aria-hidden="true"><svg class="product-card__glyph"><use href="#i-sensor"></use></svg></a><div class="product-card__body"><h3 class="product-card__title"><a href="Product.html"><span class="sc-interp">HC-SR04 Ultrasonic Distance Sensor</span></a></h3><div class="product-card__meta"><span class="price product-card__price"><span class="sc-interp">₦2,200</span></span><span class="badge badge--in"><span class="sc-interp">In stock</span></span></div><button class="btn btn--primary btn--block" type="button">Add to cart</button></div></article><article class="product-card"><a class="product-card__media" href="Product.html" tabindex="-1" aria-hidden="true"><svg class="product-card__glyph"><use href="#i-motor"></use></svg></a><div class="product-card__body"><h3 class="product-card__title"><a href="Product.html"><span class="sc-interp">SG90 Micro Servo Motor 9g</span></a></h3><div class="product-card__meta"><span class="price product-card__price"><span class="sc-interp">₦2,800</span></span><span class="badge badge--low"><span class="sc-interp">Low stock</span></span></div><button class="btn btn--primary btn--block" type="button">Add to cart</button></div></article></div></section></div><div class="product-page-end"></div></main><div class="sticky-bar"><span class="price sticky-bar__price">₦14,500</span><button class="btn btn--primary" type="button">Add to cart</button></div><div class="component"><footer class="site-footer"><div class="footer__in"><div class="footer__top"><div class="footer__brand"><p class="footer__word">Waste<b>2</b>Light</p><p class="footer__about">The components and kits branch of Waste2Light Ltd. Power. Learn. Build.</p></div><nav aria-label="Shop categories"><h2 class="footer__heading">Shop</h2><ul class="footer__list"><li><a href="Shop.html">Microcontrollers and boards</a></li><li><a href="Shop.html">Sensors</a></li><li><a href="Shop.html">Solar and power</a></li><li><a href="Shop.html">Batteries and chargers</a></li><li><a href="Shop.html">Motors and drivers</a></li><li><a href="Shop.html">All components</a></li></ul></nav><nav aria-label="Projects"><h2 class="footer__heading">Projects</h2><ul class="footer__list"><li><a href="Project.html">Solar phone charger</a></li><li><a href="Projects.html">Bottle lantern</a></li><li><a href="Projects.html">Smart dustbin</a></li><li><a href="Projects.html">Mini wind turbine</a></li><li><a href="Quote.html">Request a quote</a></li></ul></nav><nav aria-label="Help"><h2 class="footer__heading">Help</h2><ul class="footer__list"><li><a href="Track.html">Track order</a></li><li><a href="Delivery.html">Delivery and pickup</a></li><li><a href="Delivery.html">Refund policy</a></li><li><a href="Contact.html">Contact</a></li></ul></nav><nav aria-label="Waste2Light"><h2 class="footer__heading">Waste2Light</h2><ul class="footer__list"><li><a href="About.html">About</a></li><li><a href="https://waste2light.com">waste2light.com</a></li><li><a href="https://waste2light.com/green-energy-corner">Green Energy Corner</a></li><li><a href="Contact.html">Partner with us</a></li></ul></nav></div><address class="footer__contact"><p class="footer__contact-item"><svg class="icon" aria-hidden="true"><path d="M12 21s7-6 7-11a7 7 0 0 0-14 0c0 5 7 11 7 11z"></path><circle cx="12" cy="10" r="2.5"></circle></svg><span>Waste2Light Ltd<br>Bosso, Minna, Niger State, Nigeria</span></p><p class="footer__contact-item"><svg class="icon" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="M3 7l9 6 9-6"></path></svg><span>info@waste2light.com</span></p><p class="footer__contact-item"><svg class="icon" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A15 15 0 0 1 3 6a2 2 0 0 1 2-2z"></path></svg><span>+234 813 439 2943<br>WhatsApp +234 807 878 7646</span></p><p class="footer__contact-item"><svg class="icon" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"></path></svg><span><a href="https://www.tiktok.com/@waste2light">TikTok @waste2light</a> · <a href="https://www.linkedin.com/company/waste2light">LinkedIn</a></span></p></address><div class="footer__pay"><span>Secure payments by Paystack</span><span class="pay-mark">Card</span><span class="pay-mark">Bank transfer</span><span class="pay-mark">USSD</span></div><div class="footer__bottom"><p>© Waste2Light Ltd. All rights reserved.</p><div class="footer__legal"><a href="Delivery.html">Terms</a><a href="Delivery.html">Privacy</a><a href="Delivery.html">Cookies</a></div></div></div><a class="wa-float" href="https://wa.me/2348078787646" aria-label="Chat with us on WhatsApp"><svg class="icon" aria-hidden="true"><path d="M4 20l1.4-4.2A8 8 0 1 1 8.3 18.7z"></path><path d="M9.2 9.2c.2 2.4 2.4 4.6 5 5.5l1-1.3-1.7-.9-.8.6c-.9-.4-1.7-1.2-2.1-2.1l.6-.8-.9-1.7z"></path></svg><span class="wa-float__label">Chat with us</span></a></footer></div></div></div></div></div></div>
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,37 @@
+"use server";
+import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
+import { requireAdmin } from "@/lib/auth";
+import { deleteQuote, duplicateQuote, saveQuote, type LineInput, type QuoteHeader } from "@/lib/quotes";
+import { clearCart } from "@/lib/shop";
+
+// Returns errors instead of throwing: production builds hide thrown messages from the browser.
+export async function saveQuoteAction(id: number | null, header: QuoteHeader, lines: LineInput[], fromCart = false): Promise<{ id: number } | { error: string }> {
+  await requireAdmin();
+  try {
+    const saved = await saveQuote(id, {
+      billTo: String(header.billTo ?? ""), attn: String(header.attn ?? ""), notes: String(header.notes ?? ""), validUntil: String(header.validUntil ?? ""),
+    }, lines);
+    // The cart has become this quote. Lines removed in the builder are not left behind in the cart.
+    if (fromCart) {
+      await clearCart();
+      revalidatePath("/", "layout");
+    }
+    revalidatePath("/admin/quotes");
+    return { id: saved };
+  } catch (e) {
+    return { error: (e as Error).message };
+  }
+}
+
+export async function duplicateQuoteAction(id: number) {
+  await requireAdmin();
+  const copy = await duplicateQuote(id);
+  redirect(`/admin/quotes/${copy}`);
+}
+
+export async function deleteQuoteAction(id: number) {
+  await requireAdmin();
+  await deleteQuote(id);
+  redirect("/admin/quotes");
+}

@@ -136,13 +136,16 @@ export async function storeShopProducts(client: PoolClient, supplier: Supplier, 
     for (let i = 0; i < rows.length; i += 500) {
       const b = rows.slice(i, i + 500);
       await client.query(
-        `insert into supplier_products (supplier, ref, handle, title, category, image_url, price_ngn, in_stock, position, seen_at)
-         select $1, u.*, $10 from unnest($2::text[], $3::text[], $4::text[], $5::text[], $6::text[], $7::numeric[], $8::boolean[], $9::int[]) as u
+        `insert into supplier_products (supplier, ref, handle, title, category, image_url, price_ngn, in_stock, position, description, images, seen_at)
+         select $1, u.ref, u.handle, u.title, u.category, u.image_url, u.price, u.in_stock, u.position, u.description, u.images::jsonb, $12
+         from unnest($2::text[], $3::text[], $4::text[], $5::text[], $6::text[], $7::numeric[], $8::boolean[], $9::int[], $10::text[], $11::text[])
+           as u(ref, handle, title, category, image_url, price, in_stock, position, description, images)
          on conflict (supplier, ref) do update set handle = excluded.handle, title = excluded.title, category = excluded.category,
            image_url = excluded.image_url, price_ngn = excluded.price_ngn, in_stock = excluded.in_stock,
-           position = excluded.position, seen_at = excluded.seen_at`,
+           position = excluded.position, description = excluded.description, images = excluded.images, seen_at = excluded.seen_at`,
         [supplier, b.map((r) => r.ref), b.map((r) => r.handle), b.map((r) => r.title), b.map((r) => r.category),
-          b.map((r) => r.imageUrl), b.map((r) => r.price), b.map((r) => r.inStock), b.map((r) => r.position), seenAt],
+          b.map((r) => r.imageUrl), b.map((r) => r.price), b.map((r) => r.inStock), b.map((r) => r.position),
+          b.map((r) => r.description ?? ""), b.map((r) => JSON.stringify(r.images ?? [])), seenAt],
       );
     }
     const gone = await client.query("delete from supplier_products where supplier = $1 and seen_at < $2", [supplier, seenAt]);

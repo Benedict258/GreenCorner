@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Waste2Light Store: Components</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Manrope:wght@500;700;800&amp;display=swap" rel="stylesheet" data-dc-tpl="1">
+<style>
+:root{--color-bg:#f7f8f3;--color-surface:#fff;--color-text:#17231c;--color-muted:#66736b;--color-muted-strong:#4a574f;--color-border:#d8dad5;--color-primary:#0c5c2e;--color-forest:#0c4a23;--color-leaf:#35a65a;--color-sun:#f6c453;--color-primary-soft:#e7f4eb;--color-warn:#8a5a00;--color-warn-bg:#fdf0d4;--color-danger:#a02222;--color-danger-bg:#fde5e5;--font-head:'Manrope',system-ui,sans-serif;--font-body:'Inter',system-ui,sans-serif;--radius-sm:8px;--radius-md:12px;--radius-lg:20px;--radius-pill:999px}
+body{margin:0}
+.w2l{font-family:var(--font-body);font-size:16px;line-height:1.5;color:var(--color-text);background:var(--color-bg);padding:40px 40px 72px}
+.w2l *,.w2l *::before,.w2l *::after{box-sizing:border-box}
+.w2l :is(h1,h2,h3,h4){font-family:var(--font-head);letter-spacing:-.02em;line-height:1.15;margin:0}
+.w2l :is(p,ul,ol,dl,dd,fieldset){margin:0}
+:where(.w2l) a{color:var(--color-primary)}
+.w2l a:focus-visible,.w2l button:focus-visible,.w2l input:focus-visible{outline:2px solid var(--color-text);outline-offset:2px}
+.sprite{position:absolute;width:0;height:0;overflow:hidden}
+.icon{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.sheet{max-width:1200px;margin:0 auto;display:flex;flex-direction:column;gap:36px}
+.sheet__title{font-size:36px;font-weight:800}
+.sheet__sub{margin-top:8px;color:var(--color-muted-strong);max-width:70ch}
+.sec{background:#fff;border:1px solid var(--color-border);border-radius:var(--radius-lg);padding:28px;display:flex;flex-direction:column;gap:20px}
+.sec__title{font-size:22px;font-weight:800}
+.sec__note{font-size:14px;color:var(--color-muted-strong)}
+.row{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start}
+.cap{display:block;margin-bottom:6px;font:600 12px var(--font-body);letter-spacing:.04em;text-transform:uppercase;color:var(--color-muted-strong)}
+.swatches{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.sw{border:1px solid var(--color-border);border-radius:var(--radius-md);overflow:hidden;font-size:13px}
+.sw__chip{height:56px}
+.sw__txt{padding:8px 10px}
+.sw__txt b{display:block}
+.c-bg{background:var(--color-bg)}.c-text{background:var(--color-text)}.c-primary{background:var(--color-primary)}.c-forest{background:var(--color-forest)}.c-leaf{background:var(--color-leaf)}.c-sun{background:var(--color-sun)}.c-soft{background:var(--color-primary-soft)}.c-warn{background:var(--color-warn)}.c-danger{background:var(--color-danger)}.c-muted{background:var(--color-muted-strong)}
+.type{display:flex;flex-direction:column;gap:10px}
+.type__h1{font:800 40px/1.1 var(--font-head);letter-spacing:-.02em}
+.type__h2{font:800 28px/1.15 var(--font-head);letter-spacing:-.02em}
+.type__h3{font:800 20px/1.2 var(--font-head)}
+.type__body{font-size:16px}
+.type__price{font:700 22px var(--font-body);color:var(--color-primary);font-variant-numeric:tabular-nums}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 22px;border-radius:var(--radius-pill);border:1.5px solid transparent;font:600 15px/1 var(--font-body);text-decoration:none;cursor:pointer;white-space:nowrap}
+.btn--primary{background:var(--color-primary);color:#fff}
+.btn--primary:hover,.btn--primary.is-hover{background:var(--color-forest)}
+.btn--secondary{background:#fff;border-color:var(--color-primary);color:var(--color-primary)}
+.btn--secondary:hover,.btn--secondary.is-hover{background:var(--color-primary-soft)}
+.btn--sun{background:var(--color-sun);color:var(--color-text)}
+.btn--text{background:none;color:var(--color-primary);text-decoration:underline;text-underline-offset:3px;padding:0 10px}
+.btn--danger{background:#fff;border-color:var(--color-danger);color:var(--color-danger)}
+.btn--lg{min-height:52px;padding:0 28px;font-size:16px}
+.btn.is-focus{outline:2px solid var(--color-text);outline-offset:2px}
+.btn.is-disabled{background:#e4e7e1;border-color:transparent;color:#5d6a62;cursor:not-allowed}
+.btn.is-loading{background:var(--color-primary);color:#fff;opacity:.85}
+.spin{width:16px;height:16px;border-radius:50%;border:2px solid rgba(255,255,255,.4);border-top-color:#fff}
+
+.price{font-weight:700;color:var(--color-primary);font-variant-numeric:tabular-nums}
+.badge{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:var(--radius-pill);font:600 12px/1.4 var(--font-body);white-space:nowrap}
+.badge::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.badge--in{background:var(--color-primary-soft);color:var(--color-primary)}
+.badge--low{background:var(--color-warn-bg);color:var(--color-warn)}
+.badge--out{background:var(--color-danger-bg);color:var(--color-danger)}
+.badge--new{background:#e4ecf8;color:#1f4a86}
+.badge--paid{background:var(--color-primary-soft);color:var(--color-primary)}
+.badge--sourcing{background:var(--color-warn-bg);color:var(--color-warn)}
+.badge--delivered{background:#dcf0ee;color:#0b5553}
+.badge--closed{background:#e8e9ee;color:#40445a}
+.chip{display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border:1px solid #8a968e;border-radius:var(--radius-pill);background:#fff;font:600 14px var(--font-body);color:var(--color-text);cursor:pointer}
+.chip--on{background:var(--color-primary);border-color:var(--color-primary);color:#fff}
+
+.pcard{width:260px;background:#fff;border:1px solid var(--color-border);border-radius:var(--radius-md);overflow:hidden;display:flex;flex-direction:column}
+.pcard--hover{box-shadow:0 8px 24px rgba(12,74,35,.14);border-color:var(--color-leaf)}
+.pcard__img{aspect-ratio:4/3;background:var(--color-primary-soft);display:grid;place-items:center;color:var(--color-primary)}
+.pcard__body{padding:14px;display:flex;flex-direction:column;gap:8px}
+.pcard__name{font:600 15px/1.3 var(--font-body)}
+.pcard__cat{font-size:13px;color:var(--color-muted-strong)}
+.pcard__foot{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.jcard{width:300px;background:#fff;border:1px solid var(--color-border);border-radius:var(--radius-md);overflow:hidden}
+.jcard__img{aspect-ratio:16/10;background:linear-gradient(135deg,var(--color-forest),var(--color-leaf));display:grid;place-items:center;color:#fff}
+.jcard__body{padding:16px;display:flex;flex-direction:column;gap:8px}
+.jcard__meta{display:flex;gap:8px;flex-wrap:wrap}
+.jcard__meta .badge{background:var(--color-primary-soft);color:var(--color-forest)}
+.ccard{width:220px;padding:18px;border:1px solid var(--color-border);border-radius:var(--radius-md);background:#fff;display:flex;flex-direction:column;gap:10px}
+.ccard__ico{width:48px;height:48px;border-radius:var(--radius-md);background:var(--color-primary-soft);color:var(--color-primary);display:grid;place-items:center}
+.ccard__n{font-size:13px;color:var(--color-muted-strong)}
+
+.stepper{display:inline-flex;align-items:center;border:1px solid #8a968e;border-radius:var(--radius-pill);background:#fff}
+.stepper__btn{width:44px;height:44px;display:grid;place-items:center;border:0;background:none;border-radius:50%;color:var(--color-primary);cursor:pointer}
+.stepper__btn:disabled{color:#8a968e;cursor:not-allowed}
+.stepper__val{width:44px;text-align:center;font:600 16px var(--font-body)}
+.suggest{width:360px;background:#fff;border:1px solid var(--color-border);border-radius:var(--radius-md);box-shadow:0 10px 30px rgba(23,35,28,.14);overflow:hidden}
+.suggest__in{display:flex;align-items:center;gap:8px;padding:0 14px;min-height:48px;border-bottom:1px solid #edefe9}
+.suggest__list{list-style:none;padding:6px}
+.suggest__item{display:flex;justify-content:space-between;gap:10px;padding:10px;border-radius:var(--radius-sm);min-height:44px;align-items:center;font-size:14px}
+.suggest__item--on{background:var(--color-primary-soft)}
+
+.field{display:flex;flex-direction:column;gap:6px;width:300px}
+.field__label{font:600 14px var(--font-body)}
+.field__input{width:100%;min-height:48px;padding:0 14px;border:1px solid #8a968e;border-radius:var(--radius-sm);font:400 16px var(--font-body);background:#fff;color:var(--color-text)}
+.field__input--focus{border-color:var(--color-primary);outline:2px solid var(--color-primary);outline-offset:1px}
+.field__input--error{border-color:var(--color-danger);border-width:2px}
+.field__input--disabled{background:#eef0eb;color:#5d6a62}
+.field__help{font-size:13px;color:var(--color-muted-strong)}
+.field__error{display:flex;gap:6px;align-items:center;font-size:13px;color:var(--color-danger);font-weight:600}
+.rcard{display:flex;gap:12px;align-items:center;padding:14px 16px;border:1.5px solid var(--color-border);border-radius:var(--radius-md);background:#fff;min-height:56px;width:300px}
+.rcard input{width:22px;height:22px;accent-color:var(--color-primary)}
+.rcard--on{border-color:var(--color-primary);background:var(--color-primary-soft)}
+
+.alert{display:flex;gap:12px;padding:14px 16px;border-radius:var(--radius-md);width:420px;font-size:14px}
+.alert .icon{margin-top:2px}
+.alert--ok{background:var(--color-primary-soft);color:var(--color-forest)}
+.alert--warn{background:var(--color-warn-bg);color:#5a3a00}
+.alert--err{background:var(--color-danger-bg);color:#7a1818}
+.toast{display:flex;gap:12px;align-items:center;padding:12px 16px;border-radius:var(--radius-md);background:var(--color-text);color:#fff;width:380px;font-size:14px}
+.toast a{color:var(--color-sun);font-weight:600}
+.modal{width:420px;background:#fff;border-radius:var(--radius-lg);box-shadow:0 20px 50px rgba(23,35,28,.25);padding:24px;display:flex;flex-direction:column;gap:14px}
+.modal__actions{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
+.sheetm{width:340px;background:#fff;border-radius:var(--radius-lg) var(--radius-lg) 0 0;box-shadow:0 -10px 30px rgba(23,35,28,.2);padding:12px 20px 20px;display:flex;flex-direction:column;gap:12px}
+.sheetm__grab{width:40px;height:4px;border-radius:2px;background:#c4c9c2;margin:0 auto}
+
+.table{border-collapse:collapse;font-size:14px;width:100%;max-width:680px}
+.table th{text-align:left;font:600 12px var(--font-body);letter-spacing:.04em;text-transform:uppercase;color:var(--color-muted-strong);padding:10px 14px;background:#f2f4ee;border-bottom:1px solid var(--color-border)}
+.table td{padding:12px 14px;border-bottom:1px solid #edefe9}
+.table .num{text-align:right;font-variant-numeric:tabular-nums}
+.stat{width:220px;padding:18px;background:#fff;border:1px solid var(--color-border);border-radius:var(--radius-md);display:flex;flex-direction:column;gap:6px}
+.stat__label{font-size:13px;color:var(--color-muted-strong)}
+.stat__val{font:800 28px var(--font-head)}
+.stat__delta{font-size:13px;font-weight:600;color:var(--color-primary)}
+.empty{width:320px;padding:28px 20px;border:1.5px dashed #8a968e;border-radius:var(--radius-md);text-align:center;display:flex;flex-direction:column;gap:10px;align-items:center}
+.empty__ico{width:56px;height:56px;border-radius:50%;background:var(--color-primary-soft);color:var(--color-primary);display:grid;place-items:center}
+.skel{width:260px;border:1px solid var(--color-border);border-radius:var(--radius-md);overflow:hidden;background:#fff}
+.skel__img{aspect-ratio:4/3;background:#e7eae4}
+.skel__body{padding:14px;display:flex;flex-direction:column;gap:10px}
+.skel__line{height:12px;border-radius:6px;background:#e7eae4}
+.skel__line--s{width:60%}
+.pager{display:flex;gap:6px}
+.pager__btn{min-width:44px;min-height:44px;display:grid;place-items:center;border:1px solid var(--color-border);border-radius:var(--radius-pill);background:#fff;font:600 14px var(--font-body);color:var(--color-text);text-decoration:none}
+.pager__btn[aria-current="page"]{background:var(--color-primary);border-color:var(--color-primary);color:#fff}
+.crumbs{display:flex;gap:8px;flex-wrap:wrap;font-size:14px;color:var(--color-muted-strong)}
+.ph{width:200px;aspect-ratio:4/3;border-radius:var(--radius-md);background:repeating-linear-gradient(135deg,#e7f4eb,#e7f4eb 10px,#dbeee0 10px,#dbeee0 20px);display:grid;place-items:center;color:var(--color-primary);font-size:13px;font-weight:600}
+@media(max-width:760px){.w2l{padding:24px 16px 48px}.sec{padding:20px 16px}.alert,.toast,.modal,.suggest,.field,.rcard{width:100%}}
+.component{position:relative;height:auto}
+#root,#root>.component{height:auto}
+</style>
+</head>
+<body>
+
+<div id="root"><div class="component"><div class="w2l"><svg class="sprite" aria-hidden="true" focusable="false"><defs><symbol id="i-chip" viewBox="0 0 24 24"><rect x="7" y="7" width="10" height="10" rx="1.5"></rect><path d="M10 3v4M14 3v4M10 17v4M14 17v4M3 10h4M3 14h4M17 10h4M17 14h4"></path></symbol><symbol id="i-cart" viewBox="0 0 24 24"><path d="M3 4h2.5l2 11h10l2-8H7"></path><circle cx="9" cy="19" r="1.3"></circle><circle cx="17" cy="19" r="1.3"></circle></symbol><symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"></path></symbol><symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14"></path></symbol><symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"></circle><path d="M16 16l4.5 4.5"></path></symbol><symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"></path></symbol><symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 4l9 16H3z"></path><path d="M12 10v4M12 17.2v.01"></path></symbol><symbol id="i-bulb" viewBox="0 0 24 24"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"></path></symbol><symbol id="i-box" viewBox="0 0 24 24"><path d="M4 8l8-4 8 4v9l-8 4-8-4zM4 8l8 4 8-4M12 12v9"></path></symbol></defs></svg><div class="sheet"><header><h1 class="sheet__title">Waste2Light Store: components and states</h1><p class="sheet__sub">The building blocks used across every page. Class names follow BEM and every value comes from the CSS custom properties on <code>:root</code>. Touch targets are at least 44px.</p></header><section class="sec" aria-labelledby="c-colour"><h2 class="sec__title" id="c-colour">Colour</h2><div class="swatches"><div class="sw"><div class="sw__chip c-bg"></div><div class="sw__txt"><b>--color-bg</b>#f7f8f3</div></div><div class="sw"><div class="sw__chip c-text"></div><div class="sw__txt"><b>--color-text</b>#17231c</div></div><div class="sw"><div class="sw__chip c-primary"></div><div class="sw__txt"><b>--color-primary</b>#0c5c2e</div></div><div class="sw"><div class="sw__chip c-forest"></div><div class="sw__txt"><b>--color-forest</b>#0c4a23</div></div><div class="sw"><div class="sw__chip c-leaf"></div><div class="sw__txt"><b>--color-leaf</b>#35a65a</div></div><div class="sw"><div class="sw__chip c-sun"></div><div class="sw__txt"><b>--color-sun</b>#f6c453</div></div><div class="sw"><div class="sw__chip c-soft"></div><div class="sw__txt"><b>--color-primary-soft</b>#e7f4eb</div></div><div class="sw"><div class="sw__chip c-muted"></div><div class="sw__txt"><b>--color-muted-strong</b>#4a574f</div></div><div class="sw"><div class="sw__chip c-warn"></div><div class="sw__txt"><b>--color-warn</b>#8a5a00</div></div><div class="sw"><div class="sw__chip c-danger"></div><div class="sw__txt"><b>--color-danger</b>#a02222</div></div></div></section><section class="sec" aria-labelledby="c-type"><h2 class="sec__title" id="c-type">Type</h2><div class="type"><p class="type__h1">Manrope 800, Build with what you can find</p><p class="type__h2">Manrope 800, Popular components</p><p class="type__h3">Manrope 800, Solar phone charger kit</p><p class="type__body">Inter 400, Plain, practical copy. Parts are checked before they leave Minna.</p><p class="type__price">Inter 700, ₦25,800</p></div></section><section class="sec" aria-labelledby="c-btn"><h2 class="sec__title" id="c-btn">Buttons</h2><div class="row"><div><span class="cap">Primary</span><a class="btn btn--primary" href="Components.html">Add to cart</a></div><div><span class="cap">Hover</span><a class="btn btn--primary is-hover" href="Components.html">Add to cart</a></div><div><span class="cap">Focus</span><a class="btn btn--primary is-focus" href="Components.html">Add to cart</a></div><div><span class="cap">Loading</span><span class="btn is-loading"><span class="spin"></span>Adding</span></div><div><span class="cap">Disabled</span><span class="btn is-disabled" aria-disabled="true">Out of stock</span></div></div><div class="row"><div><span class="cap">Secondary</span><a class="btn btn--secondary" href="Components.html">Request a quote</a></div><div><span class="cap">Sun</span><a class="btn btn--sun" href="Components.html">Start a project</a></div><div><span class="cap">Text</span><a class="btn btn--text" href="Components.html">View all</a></div><div><span class="cap">Danger</span><a class="btn btn--danger" href="Components.html">Remove</a></div><div><span class="cap">Large</span><a class="btn btn--primary btn--lg" href="Components.html">Pay ₦37,800</a></div></div></section><section class="sec" aria-labelledby="c-badge"><h2 class="sec__title" id="c-badge">Stock badges and status chips</h2><div class="row"><span class="badge badge--in">In stock</span><span class="badge badge--low">Low stock</span><span class="badge badge--out">Out of stock</span><span class="badge badge--new">New</span><span class="badge badge--paid">Paid</span><span class="badge badge--sourcing">Sourcing</span><span class="badge badge--delivered">Delivered</span><span class="badge badge--closed">Closed</span></div><p class="sec__note">Every status pairs a dot and a word with its colour, so colour is never the only signal.</p><div class="row"><span class="chip chip--on">All</span><span class="chip">Sensors</span><span class="chip">Power and solar</span><span class="chip">In stock only</span></div></section><section class="sec" aria-labelledby="c-cards"><h2 class="sec__title" id="c-cards">Cards</h2><div class="row"><div><span class="cap">Product card</span><article class="pcard"><div class="pcard__img"><svg class="icon" width="48" height="48" aria-hidden="true"><use href="#i-chip"></use></svg></div><div class="pcard__body"><span class="badge badge--in">In stock</span><h3 class="pcard__name">ESP32 DevKit V1 (WiFi + Bluetooth)</h3><p class="pcard__cat">Microcontrollers</p><div class="pcard__foot"><span class="price">₦9,800</span><a class="btn btn--primary" href="Components.html">Add</a></div></div></article></div><div><span class="cap">Product card, hover</span><article class="pcard pcard--hover"><div class="pcard__img"><svg class="icon" width="48" height="48" aria-hidden="true"><use href="#i-chip"></use></svg></div><div class="pcard__body"><span class="badge badge--low">Low stock</span><h3 class="pcard__name">6V 2W Mini Solar Panel</h3><p class="pcard__cat">Power and solar</p><div class="pcard__foot"><span class="price">₦4,100</span><a class="btn btn--primary" href="Components.html">Add</a></div></div></article></div><div><span class="cap">Product card, out of stock</span><article class="pcard"><div class="pcard__img"><svg class="icon" width="48" height="48" aria-hidden="true"><use href="#i-chip"></use></svg></div><div class="pcard__body"><span class="badge badge--out">Out of stock</span><h3 class="pcard__name">DHT22 Temperature and Humidity Sensor</h3><p class="pcard__cat">Sensors</p><div class="pcard__foot"><span class="price">₦4,700</span><a class="btn btn--secondary" href="Components.html">Request a quote</a></div></div></article></div></div><div class="row"><div><span class="cap">Project card</span><article class="jcard"><div class="jcard__img"><svg class="icon" width="48" height="48" aria-hidden="true"><use href="#i-bulb"></use></svg></div><div class="jcard__body"><div class="jcard__meta"><span class="badge">Intermediate</span><span class="badge">2 to 3 hours</span></div><h3 class="type__h3">Solar phone charger</h3><p class="sec__note">Charge a phone from the sun.</p><span class="price">Kit ₦25,800</span></div></article></div><div><span class="cap">Category tile</span><a class="ccard" href="Components.html"><span class="ccard__ico"><svg class="icon" aria-hidden="true"><use href="#i-chip"></use></svg></span><h3 class="type__h3">Microcontrollers</h3><span class="ccard__n">142 products</span></a></div><div><span class="cap">Image placeholder</span><div class="ph">Photo coming soon</div></div></div></section><section class="sec" aria-labelledby="c-form"><h2 class="sec__title" id="c-form">Quantity, search and forms</h2><div class="row"><div><span class="cap">Stepper</span><div class="stepper" role="group" aria-label="Quantity"><button class="stepper__btn" type="button" aria-label="Fewer"><svg class="icon" aria-hidden="true"><use href="#i-minus"></use></svg></button><span class="stepper__val">2</span><button class="stepper__btn" type="button" aria-label="More"><svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg></button></div></div><div><span class="cap">Stepper at minimum</span><div class="stepper" role="group" aria-label="Quantity"><button class="stepper__btn" type="button" disabled="" aria-label="Fewer"><svg class="icon" aria-hidden="true"><use href="#i-minus"></use></svg></button><span class="stepper__val">1</span><button class="stepper__btn" type="button" aria-label="More"><svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg></button></div></div><div><span class="cap">Search suggestions</span><div class="suggest"><div class="suggest__in"><svg class="icon" aria-hidden="true"><use href="#i-search"></use></svg><span>esp</span></div><ul class="suggest__list" role="listbox" aria-label="Suggestions"><li class="suggest__item suggest__item--on" role="option" aria-selected="true"><span>ESP32 DevKit V1</span><span class="price">₦9,800</span></li><li class="suggest__item" role="option" aria-selected="false"><span>ESP8266 NodeMCU</span><span class="price">₦6,500</span></li><li class="suggest__item" role="option" aria-selected="false"><span>ESP32-CAM module</span><span class="price">₦11,200</span></li></ul></div></div></div><div class="row"><div class="field"><label class="field__label" for="f1">Default</label><input class="field__input" id="f1" value="Aisha Bello"></div><div class="field"><label class="field__label" for="f2">Focus</label><input class="field__input field__input--focus" id="f2" value="Aisha"></div><div class="field"><label class="field__label" for="f3">Error</label><input class="field__input field__input--error" id="f3" aria-invalid="true" aria-describedby="f3e" value="0802 555"><p class="field__error" id="f3e"><svg class="icon" aria-hidden="true"><use href="#i-alert"></use></svg>Enter an 11-digit phone number</p></div><div class="field"><label class="field__label" for="f4">Disabled</label><input class="field__input field__input--disabled" id="f4" disabled="" value="Minna"><p class="field__help">We only deliver in Minna for now.</p></div></div><div class="row"><label class="rcard rcard--on"><input type="radio" name="d" checked="">Delivery in Minna</label><label class="rcard"><input type="radio" name="d">Pickup at Bosso, Minna</label></div></section><section class="sec" aria-labelledby="c-fb"><h2 class="sec__title" id="c-fb">Alerts, toast, modal and bottom sheet</h2><div class="row"><div class="alert alert--ok" role="status"><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg><span>Your order is paid. We'll call you within 1 working day.</span></div><div class="alert alert--warn" role="status"><svg class="icon" aria-hidden="true"><use href="#i-alert"></use></svg><span>Only 2 left in stock. Order soon.</span></div><div class="alert alert--err" role="alert"><svg class="icon" aria-hidden="true"><use href="#i-alert"></use></svg><span>Payment not completed. Your cart is saved.</span></div></div><div class="row"><div class="toast" role="status"><svg class="icon" aria-hidden="true"><use href="#i-cart"></use></svg><span>Added to cart</span><a href="Cart.html">View cart</a></div><div class="modal" role="dialog" aria-labelledby="mt"><h3 class="type__h3" id="mt">Remove this item?</h3><p class="sec__note">The ESP32 DevKit V1 will be taken out of your cart.</p><div class="modal__actions"><a class="btn btn--secondary" href="Components.html">Keep it</a><a class="btn btn--danger" href="Components.html">Remove</a></div></div><div class="sheetm" role="dialog" aria-labelledby="bt"><span class="sheetm__grab"></span><h3 class="type__h3" id="bt">Filters</h3><div class="row"><span class="chip chip--on">In stock</span><span class="chip">Sensors</span><span class="chip">Under ₦5,000</span></div><a class="btn btn--primary" href="Components.html">Show 48 products</a></div></div></section><section class="sec" aria-labelledby="c-data"><h2 class="sec__title" id="c-data">Tables, stats, lists</h2><div class="row"><table class="table"><caption class="sr-only">Sample orders</caption><thead><tr><th scope="col">Order</th><th scope="col">Date</th><th scope="col">Status</th><th scope="col" class="num">Total</th></tr></thead><tbody><tr><td>W2L-ORD-1042</td><td>13 Oct</td><td><span class="badge badge--paid">Paid</span></td><td class="num">₦37,800</td></tr><tr><td>W2L-ORD-1039</td><td>9 Oct</td><td><span class="badge badge--delivered">Delivered</span></td><td class="num">₦12,400</td></tr></tbody></table><div class="stat"><span class="stat__label">Orders this week</span><span class="stat__val">24</span><span class="stat__delta">+6 from last week</span></div></div><div class="row"><nav aria-label="Pagination"><div class="pager"><a class="pager__btn" href="Components.html" aria-label="Previous">‹</a><a class="pager__btn" href="Components.html" aria-current="page">1</a><a class="pager__btn" href="Components.html">2</a><a class="pager__btn" href="Components.html">3</a><a class="pager__btn" href="Components.html" aria-label="Next">›</a></div></nav><nav aria-label="Breadcrumb" class="crumbs"><a href="index.html">Home</a><span aria-hidden="true">/</span><a href="Shop.html">Shop</a><span aria-hidden="true">/</span><span aria-current="page">Sensors</span></nav></div></section><section class="sec" aria-labelledby="c-empty"><h2 class="sec__title" id="c-empty">Empty and loading states</h2><div class="row"><div class="empty"><span class="empty__ico"><svg class="icon" aria-hidden="true"><use href="#i-box"></use></svg></span><h3 class="type__h3">No products found</h3><p class="sec__note">Try a shorter search, or send us the part name and we will find it.</p><a class="btn btn--secondary" href="Quote.html">Request a quote</a></div><div class="empty"><span class="empty__ico"><svg class="icon" aria-hidden="true"><use href="#i-cart"></use></svg></span><h3 class="type__h3">Your cart is empty</h3><p class="sec__note">Start with a project kit or browse components.</p><a class="btn btn--primary" href="Shop.html">Browse the shop</a></div><div><span class="cap">Skeleton</span><div class="skel" aria-hidden="true"><div class="skel__img"></div><div class="skel__body"><div class="skel__line"></div><div class="skel__line skel__line--s"></div></div></div></div></div></section></div></div></div></div>
+
+
+
+
+</body>
+</html>

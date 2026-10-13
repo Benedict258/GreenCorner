@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Admin: Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Manrope:wght@500;700;800&amp;display=swap" rel="stylesheet" data-dc-tpl="1">
+<style>
+:root{--color-bg:#f7f8f3;--color-surface:#fff;--color-text:#17231c;--color-muted:#66736b;--color-muted-strong:#4a574f;--color-border:#d8dad5;--color-primary:#0c5c2e;--color-forest:#0c4a23;--color-leaf:#35a65a;--color-sun:#f6c453;--color-primary-soft:#e7f4eb;--color-warn:#8a5a00;--color-warn-bg:#fdf0d4;--color-danger:#a02222;--color-danger-bg:#fde5e5;--font-head:'Manrope',system-ui,sans-serif;--font-body:'Inter',system-ui,sans-serif;--radius-sm:8px;--radius-md:12px;--radius-lg:16px;--radius-pill:999px}
+body{margin:0}
+.admin{display:flex;min-height:100vh;background:#f1f4ee;font-family:var(--font-body);font-size:15px;line-height:1.5;color:var(--color-text)}
+.admin *,.admin *::before,.admin *::after{box-sizing:border-box}
+.admin :is(h1,h2,h3){font-family:var(--font-head);letter-spacing:-.02em;line-height:1.15;margin:0}
+.admin :is(p,ul,ol,dl,dd){margin:0}
+:where(.admin) a{color:var(--color-primary)}
+.admin a:focus-visible,.admin button:focus-visible{outline:2px solid var(--color-text);outline-offset:2px}
+.sprite{position:absolute;width:0;height:0;overflow:hidden}
+.icon{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.admin__main{flex:1;min-width:0}
+.content{padding:28px 32px 72px;display:flex;flex-direction:column;gap:24px}
+.head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.head__title{font-size:28px;font-weight:800}
+.head__sub{margin-top:4px;color:var(--color-muted-strong)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 20px;border-radius:var(--radius-pill);border:1.5px solid transparent;font:600 14px/1 var(--font-body);text-decoration:none;cursor:pointer;white-space:nowrap}
+.btn--primary{background:var(--color-primary);color:#fff}.btn--primary:hover{background:var(--color-forest)}
+.btn--secondary{background:#fff;border-color:var(--color-primary);color:var(--color-primary)}.btn--secondary:hover{background:var(--color-primary-soft)}
+.btn--sm{min-height:44px;padding:0 16px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(220px,100%),1fr));gap:16px}
+.stat{display:flex;flex-direction:column;gap:6px;padding:18px 20px;background:#fff;border:1px solid var(--color-border);border-radius:var(--radius-lg)}
+.stat__label{font:600 13px var(--font-body);color:var(--color-muted-strong)}
+.stat__value{font:800 30px/1.1 var(--font-head);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.stat__foot{font-size:13px;color:var(--color-muted-strong)}
+.stat__foot a{font-weight:600}
+.stat--alert{border-color:#e3b04b;background:#fffaf0}
+.stat--alert .stat__value{color:var(--color-warn)}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:var(--radius-pill);font:600 12px/1.4 var(--font-body);white-space:nowrap}
+.chip::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.chip--ok{background:var(--color-primary-soft);color:var(--color-primary)}
+.chip--warn{background:var(--color-warn-bg);color:var(--color-warn)}
+.chip--bad{background:var(--color-danger-bg);color:var(--color-danger)}
+.chip--info{background:#e4ecf8;color:#1f4a86}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:20px;align-items:start}
+.panel{background:#fff;border:1px solid var(--color-border);border-radius:var(--radius-lg);overflow:hidden;min-width:0}
+.panel__head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 20px;border-bottom:1px solid #edefe9}
+.panel__title{font-size:17px;font-weight:800}
+.panel__body{padding:16px 20px 20px}
+.attn{list-style:none;padding:0}
+.attn li{display:grid;grid-template-columns:36px minmax(0,1fr) auto;gap:12px;align-items:center;padding:14px 20px;border-bottom:1px solid #edefe9}
+.attn li:last-child{border-bottom:0}
+.attn__icon{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;background:var(--color-primary-soft);color:var(--color-primary)}
+.attn__icon--warn{background:var(--color-warn-bg);color:var(--color-warn)}
+.attn__icon--bad{background:var(--color-danger-bg);color:var(--color-danger)}
+.attn__title{font-weight:600}
+.attn__title a{color:var(--color-text);text-decoration:none}.attn__title a:hover{text-decoration:underline}
+.attn__sub{font-size:13px;color:var(--color-muted-strong)}
+.attn__age{font:600 12px var(--font-body);color:var(--color-muted-strong);white-space:nowrap;text-align:right}
+.attn__age--late{color:var(--color-danger)}
+.chart__sum{display:flex;gap:24px;flex-wrap:wrap;margin-bottom:8px;font-size:13px;color:var(--color-muted-strong)}
+.chart__sum b{display:block;font:800 22px var(--font-head);color:var(--color-text);font-variant-numeric:tabular-nums}
+.chart svg{display:block;width:100%;height:auto}
+.chart text{font-family:var(--font-body);font-size:11px;fill:#4a574f}
+.chart .grid-line{stroke:#e3e7e0;stroke-width:1}
+.chart .bar{fill:var(--color-primary)}
+.chart .bar--today{fill:var(--color-sun);stroke:var(--color-forest);stroke-width:1}
+@media(max-width:1100px){.grid{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:900px){.admin{flex-direction:column}.content{padding:20px 16px 96px}.attn li{grid-template-columns:36px minmax(0,1fr)}.attn__age{grid-column:2;text-align:left}}
+:root{--color-text:#17231c;--color-primary:#0c5c2e;--color-forest:#0c4a23;--color-leaf:#35a65a;--color-sun:#f6c453;--color-primary-soft:#e7f4eb;--color-border:#d8dad5;--font-head:'Manrope',system-ui,sans-serif;--font-body:'Inter',system-ui,sans-serif}
+body{margin:0}
+.side{width:240px;min-height:100vh;display:flex;flex-direction:column;gap:20px;padding:20px 12px;background:var(--color-forest);color:#fff;font-family:var(--font-body)}
+.side *,.side *::before,.side *::after{box-sizing:border-box}
+.side :is(ul,p){margin:0}
+.side a:focus-visible,.side button:focus-visible,.tabbar a:focus-visible{outline:2px solid var(--color-sun);outline-offset:2px}
+.icon{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.sprite{position:absolute;width:0;height:0;overflow:hidden}
+.brand{display:flex;align-items:center;gap:10px;padding:4px 10px;text-decoration:none;color:#fff}
+.brand svg{width:30px;height:30px;color:var(--color-sun)}
+.brand__word{font:800 18px/1 var(--font-head);letter-spacing:-.02em}
+.brand__word b{color:var(--color-sun)}
+.brand__tag{display:block;margin-top:3px;font:600 10px var(--font-body);letter-spacing:.1em;text-transform:uppercase;color:#c9dccf}
+.nav{list-style:none;padding:0;display:flex;flex-direction:column;gap:2px}
+.nav__group{margin:14px 10px 4px;font:700 11px var(--font-body);letter-spacing:.1em;text-transform:uppercase;color:#a9c4b1}
+.nav__link{display:flex;align-items:center;gap:12px;min-height:44px;padding:0 12px;border-radius:10px;color:#e3efe6;text-decoration:none;font:500 14.5px var(--font-body)}
+.nav__link:hover{background:rgba(255,255,255,.1);color:#fff}
+.nav__link--on{background:#fff;color:var(--color-forest);font-weight:700}
+.nav__count{margin-left:auto;min-width:22px;height:22px;padding:0 7px;border-radius:11px;background:var(--color-sun);color:var(--color-text);font:700 12px/22px var(--font-body);text-align:center}
+.collapse{margin-top:auto;display:flex;align-items:center;gap:10px;min-height:44px;padding:0 12px;border:0;border-radius:10px;background:rgba(255,255,255,.08);color:#e3efe6;font:500 14px var(--font-body);cursor:pointer}
+.collapse:hover{background:rgba(255,255,255,.16)}
+.tabbar{display:none}
+@media(max-width:900px){
+.side{display:none}
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:30;display:grid;grid-template-columns:repeat(4,1fr);background:#fff;border-top:1px solid var(--color-border);box-shadow:0 -6px 20px rgba(23,35,28,.1);font-family:var(--font-body)}
+.tabbar a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:60px;color:#3d4942;text-decoration:none;font:600 12px var(--font-body);position:relative}
+.tabbar a[aria-current="page"]{color:var(--color-primary)}
+.tabbar a[aria-current="page"]::before{content:"";position:absolute;top:0;left:30%;right:30%;height:3px;border-radius:0 0 3px 3px;background:var(--color-primary)}
+.tabbar .icon{width:22px;height:22px}
+}
+:root{--color-bg:#f7f8f3;--color-text:#17231c;--color-muted-strong:#4a574f;--color-primary:#0c5c2e;--color-forest:#0c4a23;--color-sun:#f6c453;--color-primary-soft:#e7f4eb;--color-border:#d8dad5;--color-warn:#8a5a00;--color-warn-bg:#fdf0d4;--color-danger:#a02222;--color-danger-bg:#fde5e5;--font-head:'Manrope',system-ui,sans-serif;--font-body:'Inter',system-ui,sans-serif}
+body{margin:0}
+.top{position:relative;z-index:20;display:flex;align-items:center;gap:16px;min-height:72px;padding:0 24px;background:#fff;border-bottom:1px solid var(--color-border);font-family:var(--font-body);color:var(--color-text)}
+.top *,.top *::before,.top *::after{box-sizing:border-box}
+.top :is(ul,p){margin:0}
+.top a:focus-visible,.top button:focus-visible,.top input:focus-visible{outline:2px solid var(--color-text);outline-offset:2px}
+.icon{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.search{display:flex;align-items:center;gap:10px;flex:1;max-width:520px;min-height:44px;padding:0 16px;background:var(--color-bg);border:1px solid var(--color-border);border-radius:999px;color:var(--color-muted-strong)}
+.search:focus-within{background:#fff;border-color:var(--color-primary)}
+.search input{flex:1;min-width:0;border:0;outline:0;background:none;font:400 15px var(--font-body);color:var(--color-text)}
+.search kbd{font:600 11px var(--font-body);padding:2px 6px;border:1px solid var(--color-border);border-radius:6px;background:#fff}
+.right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.bell{position:relative}
+.bell__btn{position:relative;width:44px;height:44px;display:grid;place-items:center;border:0;background:none;border-radius:50%;cursor:pointer;color:var(--color-text)}
+.bell__btn:hover{background:var(--color-primary-soft)}
+.bell__count{position:absolute;top:3px;right:1px;min-width:20px;height:20px;padding:0 5px;border-radius:10px;background:var(--color-danger);color:#fff;font:700 11px/20px var(--font-body);text-align:center}
+.menu{position:absolute;right:0;top:calc(100% + 8px);width:380px;max-width:calc(100vw - 32px);background:#fff;border:1px solid var(--color-border);border-radius:16px;box-shadow:0 14px 40px rgba(23,35,28,.2);overflow:hidden}
+.menu__head{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid #edefe9}
+.menu__title{margin:0;font:800 16px var(--font-head)}
+.menu__mark{border:0;background:none;color:var(--color-primary);font:600 13px var(--font-body);cursor:pointer;min-height:44px;padding:0 6px;text-decoration:underline;text-underline-offset:3px}
+.note{list-style:none;padding:0;margin:0}
+.note li a{display:grid;grid-template-columns:12px minmax(0,1fr);gap:12px;padding:14px 18px;border-bottom:1px solid #edefe9;color:var(--color-text);text-decoration:none}
+.note li a:hover{background:#f7faf7}
+.note__dot{width:10px;height:10px;border-radius:50%;margin-top:6px;background:var(--color-primary)}
+.note__dot--read{background:transparent;border:1.5px solid #b9c2bb}
+.note__title{font:600 14px var(--font-body)}
+.note__text{font-size:13px;color:var(--color-muted-strong)}
+.note__time{font-size:12px;color:var(--color-muted-strong);margin-top:2px}
+.note__warn{color:var(--color-warn);font-weight:700}
+.menu__foot{display:block;padding:12px 18px;text-align:center;font:600 14px var(--font-body);color:var(--color-primary)}
+.user{display:flex;align-items:center;gap:10px;min-height:44px;padding:0 8px 0 4px;border:0;border-radius:999px;background:none;cursor:pointer;color:var(--color-text);font-family:var(--font-body)}
+.user:hover{background:var(--color-primary-soft)}
+.user__av{width:36px;height:36px;border-radius:50%;background:var(--color-forest);color:#fff;display:grid;place-items:center;font:700 13px var(--font-body)}
+.user__name{font:600 14px/1.2 var(--font-body);text-align:left}
+.user__role{display:block;font:500 12px var(--font-body);color:var(--color-muted-strong)}
+@media(max-width:760px){.top{padding:0 12px;gap:8px}.user__name{display:none}.search kbd{display:none}.menu{position:fixed;left:12px;right:12px;top:76px;width:auto;max-width:none}}
+.component{position:relative;height:auto}
+#root,#root>.component{height:auto}
+</style>
+</head>
+<body>
+
+<div id="root"><div class="component"><div class="admin"><svg class="sprite" aria-hidden="true" focusable="false"><defs><symbol id="i-quote" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"></path><path d="M8 9h8M8 12h5"></path></symbol><symbol id="i-bag" viewBox="0 0 24 24"><path d="M5 8h14l-1 12H6zM9 8V6a3 3 0 0 1 6 0v2"></path></symbol><symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 4l9 16H3z"></path><path d="M12 10v4M12 17.2v.01"></path></symbol><symbol id="i-sync" viewBox="0 0 24 24"><path d="M20 11a8 8 0 0 0-14-4M4 13a8 8 0 0 0 14 4M18 3v4h-4M6 21v-4h4"></path></symbol></defs></svg><div class="component"><div><svg class="sprite" aria-hidden="true" focusable="false"><defs><symbol id="a-dash" viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="1.5"></rect><rect x="13" y="4" width="7" height="7" rx="1.5"></rect><rect x="4" y="13" width="7" height="7" rx="1.5"></rect><rect x="13" y="13" width="7" height="7" rx="1.5"></rect></symbol><symbol id="a-orders" viewBox="0 0 24 24"><path d="M5 8h14l-1 12H6zM9 8V6a3 3 0 0 1 6 0v2"></path></symbol><symbol id="a-quotes" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"></path><path d="M8 9h8M8 12h5"></path></symbol><symbol id="a-quotation" viewBox="0 0 24 24"><path d="M7 3h7l4 4v14H7z"></path><path d="M14 3v4h4M10 12h5M10 16h5"></path></symbol><symbol id="a-products" viewBox="0 0 24 24"><path d="M3 7.5L12 3l9 4.5v9L12 21l-9-4.5z"></path><path d="M3 7.5l9 4.5 9-4.5M12 12v9"></path></symbol><symbol id="a-stock" viewBox="0 0 24 24"><path d="M12 3l9 5-9 5-9-5zM3 13l9 5 9-5"></path></symbol><symbol id="a-projects" viewBox="0 0 24 24"><path d="M3 7h6l2 2h10v10H3z"></path></symbol><symbol id="a-customers" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"></circle><path d="M3 19c0-3 2.7-5 6-5s6 2 6 5M16 5.5a3 3 0 0 1 0 5.5M18 14.5c1.8.6 3 2.2 3 4.5"></path></symbol><symbol id="a-sync" viewBox="0 0 24 24"><path d="M20 11a8 8 0 0 0-14-4M4 13a8 8 0 0 0 14 4M18 3v4h-4M6 21v-4h4"></path></symbol><symbol id="a-settings" viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"></path><circle cx="16" cy="7" r="2"></circle><circle cx="8" cy="17" r="2"></circle></symbol><symbol id="a-staff" viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"></path></symbol><symbol id="a-activity" viewBox="0 0 24 24"><path d="M3 12h4l3-7 4 14 3-7h4"></path></symbol><symbol id="a-more" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.2"></circle><circle cx="12" cy="12" r="1.2"></circle><circle cx="19" cy="12" r="1.2"></circle></symbol><symbol id="a-collapse" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6M20 4v16"></path></symbol></defs></svg><aside class="side" aria-label="Admin navigation"><a class="brand" href="AdminDashboard.html"><svg viewBox="0 0 34 34" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="17" cy="15" r="9"></circle><path d="M13 27h8M14.5 30h5"></path><path d="M12 15c0-3 2-5 5-5 0 3-2 5-5 5zM17 15v6"></path></svg><span><span class="brand__word">Waste<b>2</b>Light</span><span class="brand__tag">Admin</span></span></a><nav aria-label="Admin"><ul class="nav"><li><a class="nav__link nav__link--on" href="AdminDashboard.html" aria-current="page"><svg class="icon" aria-hidden="true"><use href="#a-dash"></use></svg><span class="sc-interp">Dashboard</span></a></li><li><a class="nav__link" href="AdminOrders.html"><svg class="icon" aria-hidden="true"><use href="#a-orders"></use></svg><span class="sc-interp">Orders</span><span class="nav__count"><span class="sc-interp">4</span></span></a></li><li><a class="nav__link" href="AdminQuote.html"><svg class="icon" aria-hidden="true"><use href="#a-quotes"></use></svg><span class="sc-interp">Quote requests</span><span class="nav__count"><span class="sc-interp">2</span></span></a></li><li><a class="nav__link" href="AdminQuote.html"><svg class="icon" aria-hidden="true"><use href="#a-quotation"></use></svg><span class="sc-interp">Quotations</span></a></li><li><a class="nav__link" href="AdminProducts.html"><svg class="icon" aria-hidden="true"><use href="#a-products"></use></svg><span class="sc-interp">Products</span></a></li><li><a class="nav__link" href="AdminProducts.html"><svg class="icon" aria-hidden="true"><use href="#a-stock"></use></svg><span class="sc-interp">Stock</span></a></li><li><a class="nav__link" href="AdminProjectEditor.html"><svg class="icon" aria-hidden="true"><use href="#a-projects"></use></svg><span class="sc-interp">Projects</span></a></li><li><a class="nav__link" href="AdminOrders.html"><svg class="icon" aria-hidden="true"><use href="#a-customers"></use></svg><span class="sc-interp">Customers</span></a></li><li><a class="nav__link" href="AdminDashboard.html"><svg class="icon" aria-hidden="true"><use href="#a-sync"></use></svg><span class="sc-interp">Sync</span></a></li><li><a class="nav__link" href="AdminDashboard.html"><svg class="icon" aria-hidden="true"><use href="#a-settings"></use></svg><span class="sc-interp">Settings</span></a></li><li><a class="nav__link" href="AdminDashboard.html"><svg class="icon" aria-hidden="true"><use href="#a-staff"></use></svg><span class="sc-interp">Staff</span></a></li><li><a class="nav__link" href="AdminDashboard.html"><svg class="icon" aria-hidden="true"><use href="#a-activity"></use></svg><span class="sc-interp">Activity</span></a></li></ul></nav><button class="collapse" type="button"><svg class="icon" aria-hidden="true"><use href="#a-collapse"></use></svg>Collapse menu</button></aside><nav class="tabbar" aria-label="Admin quick navigation"><a href="AdminDashboard.html" aria-current="page"><svg class="icon" aria-hidden="true"><use href="#a-dash"></use></svg>Dashboard</a><a href="AdminOrders.html"><svg class="icon" aria-hidden="true"><use href="#a-orders"></use></svg>Orders</a><a href="AdminQuote.html"><svg class="icon" aria-hidden="true"><use href="#a-quotes"></use></svg>Quotes</a><a href="AdminProducts.html"><svg class="icon" aria-hidden="true"><use href="#a-more"></use></svg>More</a></nav></div></div><div class="admin__main"><div class="component"><header class="top"><form class="search" role="search"><svg class="icon" aria-hidden="true"><circle cx="11" cy="11" r="6.5"></circle><path d="M16 16l4.5 4.5"></path></svg><label class="sr-only" for="adm-q">Search orders, customers and products</label><input id="adm-q" type="search" placeholder="Search orders, customers, products"><kbd>/</kbd></form><div class="right"><div class="bell"><button class="bell__btn" type="button" aria-label="Notifications, 3 unread" aria-expanded="true"><svg class="icon" aria-hidden="true"><path d="M6 17V11a6 6 0 0 1 12 0v6l1.5 2h-15zM10 21h4"></path></svg><span class="bell__count">3</span></button><div class="menu" role="region" aria-label="Notifications"><div class="menu__head"><h2 class="menu__title">Notifications</h2><button class="menu__mark" type="button">Mark all as read</button></div><ul class="note"><li><a href="AdminOrderDetail.html"><span class="note__dot"></span><span><p class="note__title">New order W2L-ORD-1043</p><p class="note__text">Chinedu Okafor · ₦14,500 · pay confirmed</p><p class="note__time">4 minutes ago</p></span></a></li><li><a href="AdminQuote.html"><span class="note__dot"></span><span><p class="note__title">New quote request W2L-REQ-0031</p><p class="note__text">Hillcrest Model Academy · 10 solar charger kits</p><p class="note__time">1 hour ago</p></span></a></li><li><a href="AdminDashboard.html"><span class="note__dot"></span><span><p class="note__title"><span class="note__warn">Sync problem:</span> 4 price changes held</p><p class="note__text">Review and approve in Sync</p><p class="note__time">Today, 06:00</p></span></a></li><li><a href="AdminOrderDetail.html"><span class="note__dot note__dot--read"></span><span><p class="note__title">Order W2L-ORD-1039 completed</p><p class="note__text">Musa Danjuma · pickup</p><p class="note__time">Yesterday</p></span></a></li></ul><a class="menu__foot" href="AdminDashboard.html">View all notifications</a></div></div><button class="user" type="button" aria-label="Account menu, Ibrahim Danladi, Owner"><span class="user__av">ID</span><span class="user__name">Ibrahim Danladi<span class="user__role">Owner</span></span><svg class="icon" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg></button></div></header></div><main class="content" id="main"><div class="head"><div><h1 class="head__title">Dashboard</h1><p class="head__sub">Tuesday 13 October 2026</p></div><a class="btn btn--secondary" href="AdminDashboard.html"><svg class="icon" aria-hidden="true"><use href="#i-sync"></use></svg>Sync now</a></div><section class="stats" aria-label="Today at a glance"><div class="stat"><p class="stat__label">Sales today</p><p class="stat__value">₦186,000</p><p class="stat__foot">3 paid orders</p></div><div class="stat"><p class="stat__label">Sales this month</p><p class="stat__value">₦1,702,000</p><p class="stat__foot">1 to 13 October</p></div><div class="stat stat--alert"><p class="stat__label">New orders to confirm</p><p class="stat__value">4</p><p class="stat__foot"><a href="AdminOrders.html">Open orders</a></p></div><div class="stat stat--alert"><p class="stat__label">Open quote requests</p><p class="stat__value">2</p><p class="stat__foot"><a href="AdminQuote.html">Open requests</a></p></div><div class="stat"><p class="stat__label">Items to source from Microscale</p><p class="stat__value">11</p><p class="stat__foot">Across 4 orders</p></div><div class="stat"><p class="stat__label">Low stock</p><p class="stat__value">7</p><p class="stat__foot"><a href="AdminProducts.html">View products</a></p></div><div class="stat"><p class="stat__label">Last sync</p><p class="stat__value">06:00</p><p class="stat__foot"><span class="chip chip--ok">Finished</span> <span class="chip chip--warn">4 price changes held</span></p></div></section><div class="grid"><section class="panel" aria-labelledby="attn-title"><div class="panel__head"><h2 class="panel__title" id="attn-title">Needs attention</h2><span class="stat__foot">Oldest first</span></div><ul class="attn"><li><span class="attn__icon attn__icon--bad"><svg class="icon" aria-hidden="true"><use href="#i-quote"></use></svg></span><div><p class="attn__title"><a href="AdminQuote.html">Quote request W2L-REQ-0028</a></p><p class="attn__sub">St. Cecilia Girls' Science School · not contacted yet</p></div><p class="attn__age attn__age--late">3 days</p></li><li><span class="attn__icon attn__icon--warn"><svg class="icon" aria-hidden="true"><use href="#i-bag"></use></svg></span><div><p class="attn__title"><a href="AdminOrderDetail.html">Order W2L-ORD-1038</a></p><p class="attn__sub">Tunde Adeyemi · paid, waiting to be confirmed</p></div><p class="attn__age attn__age--late">2 days</p></li><li><span class="attn__icon attn__icon--bad"><svg class="icon" aria-hidden="true"><use href="#i-alert"></use></svg></span><div><p class="attn__title"><a href="AdminOrderDetail.html">Order W2L-ORD-1040</a></p><p class="attn__sub">Ngozi Eze · 1 item unavailable, refund the item</p></div><p class="attn__age">1 day</p></li><li><span class="attn__icon attn__icon--warn"><svg class="icon" aria-hidden="true"><use href="#i-sync"></use></svg></span><div><p class="attn__title"><a href="AdminDashboard.html">Held price changes</a></p><p class="attn__sub">4 changes above the safe limit need approval</p></div><p class="attn__age">7 hours</p></li><li><span class="attn__icon"><svg class="icon" aria-hidden="true"><use href="#i-bag"></use></svg></span><div><p class="attn__title"><a href="AdminOrderDetail.html">Order W2L-ORD-1043</a></p><p class="attn__sub">Chinedu Okafor · new, ₦14,500</p></div><p class="attn__age">4 min</p></li></ul></section><section class="panel chart" aria-labelledby="chart-title"><div class="panel__head"><h2 class="panel__title" id="chart-title">Sales, last 30 days</h2><span class="chip chip--info">Paid orders</span></div><div class="panel__body"><div class="chart__sum"><span>Total<b>₦3,558,000</b></span><span>Best day<b>₦214,000</b></span><span>Daily average<b>₦118,600</b></span></div><svg viewBox="0 0 720 250" role="img" aria-label="Bar chart of daily sales from 14 September to 13 October 2026. Sales rise through the period, with the highest day at 214 thousand naira on 6 October."><g><line class="grid-line" x1="56" x2="712" y1="196" y2="196"></line><line class="grid-line" x1="56" x2="712" y1="124" y2="124"></line><line class="grid-line" x1="56" x2="712" y1="52" y2="52"></line><text x="48" y="200" text-anchor="end">₦0</text><text x="48" y="128" text-anchor="end">₦100k</text><text x="48" y="56" text-anchor="end">₦200k</text></g><g><rect class="bar" x="58.0" y="137" width="15" height="59" rx="2"></rect><rect class="bar" x="79.8" y="110" width="15" height="86" rx="2"></rect><rect class="bar" x="101.6" y="150" width="15" height="46" rx="2"></rect><rect class="bar" x="123.4" y="88" width="15" height="108" rx="2"></rect><rect class="bar" x="145.2" y="125" width="15" height="71" rx="2"></rect><rect class="bar" x="167.0" y="167" width="15" height="29" rx="2"></rect><rect class="bar" x="188.8" y="171" width="15" height="25" rx="2"></rect><rect class="bar" x="210.6" y="94" width="15" height="102" rx="2"></rect><rect class="bar" x="232.4" y="75" width="15" height="121" rx="2"></rect><rect class="bar" x="254.2" y="117" width="15" height="79" rx="2"></rect><rect class="bar" x="276.0" y="100" width="15" height="96" rx="2"></rect><rect class="bar" x="297.8" y="130" width="15" height="66" rx="2"></rect><rect class="bar" x="319.6" y="161" width="15" height="35" rx="2"></rect><rect class="bar" x="341.4" y="153" width="15" height="43" rx="2"></rect><rect class="bar" x="363.2" y="69" width="15" height="127" rx="2"></rect><rect class="bar" x="385.0" y="48" width="15" height="148" rx="2"></rect><rect class="bar" x="406.8" y="101" width="15" height="95" rx="2"></rect><rect class="bar" x="428.6" y="111" width="15" height="85" rx="2"></rect><rect class="bar" x="450.4" y="88" width="15" height="108" rx="2"></rect><rect class="bar" x="472.2" y="146" width="15" height="50" rx="2"></rect><rect class="bar" x="494.0" y="159" width="15" height="37" rx="2"></rect><rect class="bar" x="515.8" y="61" width="15" height="135" rx="2"></rect><rect class="bar" x="537.6" y="42" width="15" height="154" rx="2"></rect><rect class="bar" x="559.4" y="81" width="15" height="115" rx="2"></rect><rect class="bar" x="581.2" y="94" width="15" height="102" rx="2"></rect><rect class="bar" x="603.0" y="105" width="15" height="91" rx="2"></rect><rect class="bar" x="624.8" y="148" width="15" height="48" rx="2"></rect><rect class="bar" x="646.6" y="154" width="15" height="42" rx="2"></rect><rect class="bar" x="668.4" y="72" width="15" height="124" rx="2"></rect><rect class="bar bar--today" x="690.2" y="62" width="15" height="134" rx="2"></rect></g><g><text x="64" y="220" text-anchor="middle">14 Sep</text><text x="173" y="220" text-anchor="middle">19 Sep</text><text x="283" y="220" text-anchor="middle">24 Sep</text><text x="392" y="220" text-anchor="middle">29 Sep</text><text x="501" y="220" text-anchor="middle">4 Oct</text><text x="611" y="220" text-anchor="middle">9 Oct</text><text x="704" y="220" text-anchor="end">Today</text></g></svg></div></section></div></main></div></div></div></div>
+
+
+
+
+</body>
+</html>

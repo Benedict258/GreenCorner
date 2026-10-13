@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Waste2Light Store: Delivery and pickup</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Manrope:wght@500;700;800&amp;display=swap" rel="stylesheet" data-dc-tpl="1">
+<style>
+:root{--color-bg:#f7f8f3;--color-surface:#fff;--color-text:#17231c;--color-muted:#66736b;--color-muted-strong:#4a574f;--color-border:#d8dad5;--color-primary:#0c5c2e;--color-forest:#0c4a23;--color-primary-soft:#e7f4eb;--color-warn:#8a5a00;--color-warn-bg:#fdf0d4;--font-head:'Manrope',system-ui,sans-serif;--font-body:'Inter',system-ui,sans-serif;--radius-sm:8px;--radius-md:12px;--radius-lg:20px}
+body{margin:0}
+.w2l{font-family:var(--font-body);font-size:16px;line-height:1.5;color:var(--color-text);background:var(--color-bg)}
+.w2l *,.w2l *::before,.w2l *::after{box-sizing:border-box}
+.w2l :is(h1,h2,h3){font-family:var(--font-head);letter-spacing:-.02em;line-height:1.15;margin:0}
+.w2l p,.w2l ul,.w2l ol{margin:0}
+:where(.w2l) a{color:var(--color-primary)}
+a:focus-visible{outline:2px solid var(--color-text);outline-offset:2px}
+.container{max-width:1200px;margin:0 auto;padding:0 24px}
+.crumbs{padding:20px 0 4px;font-size:14px;color:var(--color-muted-strong)}
+.crumbs ol{list-style:none;padding:0;display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.crumbs a{color:var(--color-muted-strong)}
+.crumbs li+li::before{content:"›";margin-right:6px;color:var(--color-muted)}
+.doc{display:grid;grid-template-columns:240px minmax(0,1fr);gap:56px;align-items:start;padding:24px 0 80px}
+.toc{position:sticky;top:16px;font-size:14px}
+.toc__title{font:700 13px var(--font-body);letter-spacing:.08em;text-transform:uppercase;color:var(--color-muted-strong);margin-bottom:10px}
+.toc ol{list-style:none;padding:0;display:flex;flex-direction:column;gap:2px;border-left:2px solid var(--color-border)}
+.toc a{display:flex;align-items:center;min-height:36px;padding:0 14px;margin-left:-2px;border-left:2px solid transparent;color:var(--color-text);text-decoration:none}
+.toc a:hover{background:var(--color-primary-soft)}
+.toc a[aria-current="true"]{border-left-color:var(--color-primary);color:var(--color-primary);font-weight:700}
+.prose{max-width:70ch}
+.prose h1{font-size:clamp(30px,4vw,40px);font-weight:800}
+.prose .lead{margin-top:14px;font-size:19px;color:var(--color-muted-strong);line-height:1.6}
+.prose h2{font-size:24px;font-weight:800;margin-top:44px;padding-top:8px;scroll-margin-top:16px}
+.prose p{margin-top:14px;line-height:1.75;color:#2a3a31}
+.prose ul{margin-top:14px;padding-left:22px;display:flex;flex-direction:column;gap:8px;line-height:1.7;color:#2a3a31}
+.prose .callout{margin-top:20px;padding:16px 18px;border-radius:var(--radius-md);background:var(--color-primary-soft);color:var(--color-forest);line-height:1.6}
+.prose .placeholder{margin-top:20px;padding:14px 18px;border-radius:var(--radius-md);background:var(--color-warn-bg);color:#5a3a00;font-size:15px}
+.prose table{margin-top:18px;width:100%;border-collapse:collapse;font-size:15px;background:#fff;border:1px solid var(--color-border);border-radius:var(--radius-md);overflow:hidden}
+.prose th{text-align:left;padding:12px 16px;background:#f2f4ee;font:600 13px var(--font-body);color:var(--color-muted-strong)}
+.prose td{padding:12px 16px;border-top:1px solid #edefe9}
+@media(max-width:900px){.doc{grid-template-columns:minmax(0,1fr);gap:24px}.toc{display:none}}
+@media(max-width:760px){.container{padding:0 16px}.doc{padding-bottom:48px}}
+:root{--color-bg:#f7f8f3;--color-text:#17231c;--color-muted:#66736b;--color-border:#d8dad5;--color-primary:#0c5c2e;--color-forest:#0c4a23;--color-primary-soft:#e7f4eb;--font-head:'Manrope',system-ui,sans-serif;--font-body:'Inter',system-ui,sans-serif}
+body{margin:0}
+.site-header{font-family:var(--font-body);color:var(--color-text);background:#fff;border-bottom:1px solid var(--color-border)}
+.site-header *,.site-header *::before,.site-header *::after{box-sizing:border-box}
+.site-header a{color:inherit}
+.site-header a:focus-visible,.site-header button:focus-visible,.site-header input:focus-visible{outline:2px solid var(--color-text);outline-offset:2px}
+.icon{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.skip-link{position:absolute;left:8px;top:-60px;background:var(--color-forest);color:#fff;padding:10px 16px;border-radius:8px;z-index:5;font:600 14px var(--font-body);text-decoration:none}
+.skip-link:focus{top:8px}
+.strip{background:var(--color-primary-soft);color:var(--color-forest);font-size:13px}
+.strip__in{position:relative;max-width:1200px;margin:0 auto;padding:0 56px;min-height:40px;display:flex;align-items:center;justify-content:center;text-align:center}
+.strip__close{position:absolute;right:6px;top:0;width:44px;height:40px;display:grid;place-items:center;border:0;background:none;color:var(--color-forest);cursor:pointer;border-radius:50%}
+.strip__close .icon{width:16px;height:16px}
+.bar{max-width:1200px;margin:0 auto;padding:0 24px;min-height:72px;display:flex;align-items:center;gap:20px}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.logo__mark{width:34px;height:34px;color:var(--color-primary)}
+.logo__word{font:800 20px/1 var(--font-head);letter-spacing:-.02em}
+.logo__word b{color:var(--color-primary);font-weight:800}
+.logo__tag{font:600 11px/1 var(--font-body);letter-spacing:.08em;text-transform:uppercase;background:var(--color-primary-soft);color:var(--color-primary);padding:5px 8px;border-radius:999px}
+.nav{display:flex;gap:2px;margin:0 auto}
+.nav__link{display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border-radius:999px;text-decoration:none;font:500 15px var(--font-body)}
+.nav__link:hover{background:var(--color-primary-soft)}
+.nav__link--active{background:var(--color-primary-soft);color:var(--color-primary);font-weight:600}
+.search{display:flex;align-items:center;gap:8px;width:250px;min-height:44px;padding:0 14px;background:var(--color-bg);border:1px solid var(--color-border);border-radius:999px;color:var(--color-muted)}
+.search:focus-within{border-color:var(--color-primary);background:#fff}
+.search input{flex:1;min-width:0;border:0;outline:0;background:none;font:400 15px var(--font-body);color:var(--color-text)}
+.search input:focus-visible{outline:0}
+.actions{display:flex;align-items:center;gap:2px}
+.icon-btn{position:relative;display:grid;place-items:center;width:44px;height:44px;border:0;background:none;border-radius:50%;color:var(--color-text);cursor:pointer;text-decoration:none}
+.icon-btn:hover{background:var(--color-primary-soft)}
+.icon-btn__badge{position:absolute;top:3px;right:1px;min-width:20px;height:20px;padding:0 5px;border-radius:10px;background:var(--color-primary);color:#fff;font:700 11px/20px var(--font-body);text-align:center}
+.icon-btn--phone{display:none}
+@media(max-width:1000px){.nav,.search,.icon-btn--account{display:none}.icon-btn--phone{display:grid}.bar{gap:4px;padding:0 12px 0 16px}.logo{margin-right:auto}}
+@media(max-width:480px){.logo__tag{display:none}.strip__in{padding:0 48px 0 16px;text-align:left;font-size:12.5px}}
+:root{--color-text:#17231c;--color-primary:#0c5c2e;--color-forest:#0c4a23;--color-leaf:#35a65a;--color-sun:#f6c453;--color-primary-soft:#e7f4eb;--font-head:'Manrope',system-ui,sans-serif;--font-body:'Inter',system-ui,sans-serif}
+body{margin:0}
+.site-footer{position:relative;font-family:var(--font-body);background:var(--color-forest);color:#fff;font-size:15px;line-height:1.6}
+.site-footer *,.site-footer *::before,.site-footer *::after{box-sizing:border-box}
+.site-footer a{color:#dcebe0;text-decoration:none;display:inline-flex;align-items:center;min-height:32px}
+.site-footer a:hover{color:#fff;text-decoration:underline}
+.site-footer a:focus-visible,.site-footer button:focus-visible{outline:2px solid var(--color-sun);outline-offset:2px}
+.icon{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.footer__in{max-width:1200px;margin:0 auto;padding:64px 24px 28px}
+.footer__top{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(200px,100%),1fr));gap:36px}
+.footer__brand{max-width:340px}
+.footer__word{font:800 22px/1 var(--font-head);letter-spacing:-.02em;color:#fff}
+.footer__word b{color:var(--color-sun)}
+.footer__about{margin-top:14px;color:#c9dccf;font-size:14px}
+.footer__heading{font:700 13px var(--font-body);letter-spacing:.08em;text-transform:uppercase;color:var(--color-sun);margin:0 0 12px}
+.footer__list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
+.footer__contact{font-style:normal;margin-top:40px;padding-top:28px;border-top:1px solid rgba(255,255,255,.18);display:grid;grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr));gap:12px 36px;font-size:14px;color:#dcebe0}
+.footer__contact-item{display:flex;gap:10px;align-items:flex-start}
+.footer__contact-item .icon{margin-top:3px;color:var(--color-sun)}
+.footer__pay{margin-top:28px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;color:#dcebe0;font-size:14px}
+.pay-mark{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border:1px solid rgba(255,255,255,.4);border-radius:999px;font:600 12px var(--font-body);color:#fff}
+.footer__bottom{margin-top:28px;padding-top:20px;border-top:1px solid rgba(255,255,255,.18);display:flex;justify-content:space-between;gap:12px 24px;flex-wrap:wrap;font-size:13px;color:#c9dccf}
+.footer__legal{display:flex;gap:20px;flex-wrap:wrap}
+.footer__legal a{min-height:44px}
+.wa-float{position:fixed;right:20px;bottom:20px;z-index:20;display:inline-flex;align-items:center;gap:10px;height:56px;min-width:56px;padding:0 16px;border-radius:999px;background:var(--color-primary);color:#fff !important;box-shadow:0 10px 30px rgba(23,35,28,.28);border:2px solid #fff}
+.wa-float:hover{background:#0a4a25;text-decoration:none !important}
+.wa-float .icon{width:26px;height:26px}
+.wa-float__label{display:none;font:600 14px var(--font-body)}
+.wa-float:hover .wa-float__label,.wa-float:focus-visible .wa-float__label{display:inline}
+@media(max-width:760px){.footer__in{padding:48px 16px 24px}.wa-float{bottom:84px;right:12px}}
+.component{position:relative;height:auto}
+#root,#root>.component{height:auto}
+</style>
+</head>
+<body>
+
+<div id="root"><div class="component"><div class="w2l"><div class="component"><header class="site-header"><a class="skip-link" href="#main">Skip to content</a><div class="strip"><div class="strip__in"><p>Delivery and pickup in Minna, Niger State. Free delivery on every order.</p><button class="strip__close" type="button" aria-label="Dismiss announcement"><svg class="icon" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button></div></div><div class="bar"><a class="logo" href="index.html" aria-label="Waste2Light Store, home"><svg class="logo__mark" viewBox="0 0 34 34" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="17" cy="15" r="9"></circle><path d="M13 27h8M14.5 30h5"></path><path d="M12 15c0-3 2-5 5-5 0 3-2 5-5 5zM17 15v6"></path></svg><span class="logo__word">Waste<b>2</b>Light</span><span class="logo__tag">Store</span></a><nav aria-label="Main"><div class="nav"><a class="nav__link" href="Shop.html">Shop</a><a class="nav__link" href="Projects.html">Projects</a><a class="nav__link" href="index.html#schools">For schools</a><a class="nav__link" href="About.html">About</a><a class="nav__link" href="Contact.html">Contact</a></div></nav><form class="search" role="search"><svg class="icon" aria-hidden="true"><circle cx="11" cy="11" r="6.5"></circle><path d="M16 16l4.5 4.5"></path></svg><label class="sr-only" for="hdr-q">Search components</label><input id="hdr-q" type="search" placeholder="Search components"></form><div class="actions"><button class="icon-btn icon-btn--phone" type="button" aria-label="Search"><svg class="icon" aria-hidden="true"><circle cx="11" cy="11" r="6.5"></circle><path d="M16 16l4.5 4.5"></path></svg></button><a class="icon-btn icon-btn--account" href="AccountOrders.html" aria-label="Account"><svg class="icon" aria-hidden="true"><circle cx="12" cy="8" r="3.5"></circle><path d="M5 20c0-3.6 3.1-6 7-6s7 2.4 7 6"></path></svg></a><a class="icon-btn" href="Cart.html" aria-label="Cart, 3 items"><svg class="icon" aria-hidden="true"><path d="M3 4h2l2.4 11.2a1.5 1.5 0 0 0 1.5 1.2h7.7a1.5 1.5 0 0 0 1.5-1.1L20 8H6.2"></path><circle cx="9.5" cy="20" r="1"></circle><circle cx="17" cy="20" r="1"></circle></svg><span class="icon-btn__badge"><span class="sc-interp">3</span></span></a><a class="icon-btn icon-btn--phone" href="MenuM.html" aria-label="Open menu"><svg class="icon" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"></path></svg></a></div></div></header></div><main id="main"><div class="container"><nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="index.html">Home</a></li><li aria-current="page">Delivery and pickup</li></ol></nav><div class="doc"><nav class="toc" aria-label="On this page"><p class="toc__title">On this page</p><ol><li><a href="#minna" aria-current="true">Delivery in Minna</a></li><li><a href="#pickup">Pickup at Bosso</a></li><li><a href="#large">Large and class orders</a></li><li><a href="#payment">Payment</a></li><li><a href="#refunds">Refund policy</a></li></ol></nav><article class="prose"><h1>Delivery and pickup</h1><p class="lead">Everything you order is delivered free in Minna, or ready for pickup at our base in Bosso.</p><h2 id="minna">Delivery in Minna</h2><p>We deliver in Minna, Niger State only for now. Delivery is free on every order.</p><p>After you pay, we call you within 1 working day to confirm your order, your address and a time that suits you. Please keep your phone on.</p><table><thead><tr><th scope="col">Where</th><th scope="col">Cost</th><th scope="col">When</th></tr></thead><tbody><tr><td>Minna, Niger State</td><td>Free</td><td>We agree this when we call you</td></tr><tr><td>Outside Minna</td><td>Not available yet</td><td>Message us on WhatsApp to ask</td></tr></tbody></table><h2 id="pickup">Pickup at Bosso</h2><p>Choose pickup at checkout and collect your order from Waste2Light, Bosso, Minna. We call you when it is ready.</p><ul><li>Bring your order number, W2L-ORD-xxxx, or the phone you used at checkout.</li><li>Opening hours: [OPENING HOURS].</li></ul><h2 id="large">Large and class orders</h2><p class="callout">For large orders we'll agree delivery or pickup with you when we call. Schools can send a cart or a project as a quote request instead of paying online.</p><p>Use <a href="Quote.html">Request a quote</a> and we will call you with an official quotation.</p><h2 id="payment">Payment</h2><p>You pay securely on Paystack's page with a card, bank transfer or USSD. We never see your card details.</p><p>Your price is locked when you check out.</p><h2 id="refunds">Refund policy</h2><p class="placeholder">[REFUND POLICY TEXT: to be written and approved by Waste2Light. Cover what can be returned, how long customers have, how refunds are paid, and what happens when a part is unavailable after payment.]</p><p>Terms of use and the privacy policy use this same page layout: a readable column, headings and a table of contents on desktop.</p></article></div></div></main><div class="component"><footer class="site-footer"><div class="footer__in"><div class="footer__top"><div class="footer__brand"><p class="footer__word">Waste<b>2</b>Light</p><p class="footer__about">The components and kits branch of Waste2Light Ltd. Power. Learn. Build.</p></div><nav aria-label="Shop categories"><h2 class="footer__heading">Shop</h2><ul class="footer__list"><li><a href="Shop.html">Microcontrollers and boards</a></li><li><a href="Shop.html">Sensors</a></li><li><a href="Shop.html">Solar and power</a></li><li><a href="Shop.html">Batteries and chargers</a></li><li><a href="Shop.html">Motors and drivers</a></li><li><a href="Shop.html">All components</a></li></ul></nav><nav aria-label="Projects"><h2 class="footer__heading">Projects</h2><ul class="footer__list"><li><a href="Project.html">Solar phone charger</a></li><li><a href="Projects.html">Bottle lantern</a></li><li><a href="Projects.html">Smart dustbin</a></li><li><a href="Projects.html">Mini wind turbine</a></li><li><a href="Quote.html">Request a quote</a></li></ul></nav><nav aria-label="Help"><h2 class="footer__heading">Help</h2><ul class="footer__list"><li><a href="Track.html">Track order</a></li><li><a href="Delivery.html">Delivery and pickup</a></li><li><a href="Delivery.html">Refund policy</a></li><li><a href="Contact.html">Contact</a></li></ul></nav><nav aria-label="Waste2Light"><h2 class="footer__heading">Waste2Light</h2><ul class="footer__list"><li><a href="About.html">About</a></li><li><a href="https://waste2light.com">waste2light.com</a></li><li><a href="https://waste2light.com/green-energy-corner">Green Energy Corner</a></li><li><a href="Contact.html">Partner with us</a></li></ul></nav></div><address class="footer__contact"><p class="footer__contact-item"><svg class="icon" aria-hidden="true"><path d="M12 21s7-6 7-11a7 7 0 0 0-14 0c0 5 7 11 7 11z"></path><circle cx="12" cy="10" r="2.5"></circle></svg><span>Waste2Light Ltd<br>Bosso, Minna, Niger State, Nigeria</span></p><p class="footer__contact-item"><svg class="icon" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="M3 7l9 6 9-6"></path></svg><span>info@waste2light.com</span></p><p class="footer__contact-item"><svg class="icon" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A15 15 0 0 1 3 6a2 2 0 0 1 2-2z"></path></svg><span>+234 813 439 2943<br>WhatsApp +234 807 878 7646</span></p><p class="footer__contact-item"><svg class="icon" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"></path></svg><span><a href="https://www.tiktok.com/@waste2light">TikTok @waste2light</a> · <a href="https://www.linkedin.com/company/waste2light">LinkedIn</a></span></p></address><div class="footer__pay"><span>Secure payments by Paystack</span><span class="pay-mark">Card</span><span class="pay-mark">Bank transfer</span><span class="pay-mark">USSD</span></div><div class="footer__bottom"><p>© Waste2Light Ltd. All rights reserved.</p><div class="footer__legal"><a href="Delivery.html">Terms</a><a href="Delivery.html">Privacy</a><a href="Delivery.html">Cookies</a></div></div></div><a class="wa-float" href="https://wa.me/2348078787646" aria-label="Chat with us on WhatsApp"><svg class="icon" aria-hidden="true"><path d="M4 20l1.4-4.2A8 8 0 1 1 8.3 18.7z"></path><path d="M9.2 9.2c.2 2.4 2.4 4.6 5 5.5l1-1.3-1.7-.9-.8.6c-.9-.4-1.7-1.2-2.1-2.1l.6-.8-.9-1.7z"></path></svg><span class="wa-float__label">Chat with us</span></a></footer></div></div></div></div>
+
+
+
+
+</body>
+</html>

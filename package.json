@@ -12,6 +12,7 @@
     "migrate": "tsx scripts/migrate.ts",
     "sync": "tsx scripts/sync.ts",
     "hash-password": "tsx scripts/hash-password.ts",
+    "seed-demo": "tsx scripts/seed-demo.ts",
     "capture-fixtures": "tsx scripts/capture-fixtures.ts",
     "extract-brand": "tsx scripts/extract-brand.ts",
     "test:deferred": "vitest run --config vitest.deferred.config.mts"

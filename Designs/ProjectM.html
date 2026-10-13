@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Project: phone</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Manrope:wght@500;700;800&amp;display=swap" rel="stylesheet" data-dc-tpl="1">
+<style>
+body{margin:0}
+:root{--color-bg:#f7f8f3;--color-surface:#fff;--color-text:#17231c;--color-muted:#66736b;--color-muted-strong:#4a574f;--color-border:#d8dad5;--color-primary:#0c5c2e;--color-forest:#0c4a23;--color-leaf:#35a65a;--color-sun:#f6c453;--color-primary-soft:#e7f4eb;--color-warn:#8a5a00;--color-warn-bg:#fdf0d4;--color-danger:#a02222;--color-danger-bg:#fde5e5;--font-head:'Manrope',system-ui,sans-serif;--font-body:'Inter',system-ui,sans-serif;--radius-sm:8px;--radius-md:12px;--radius-lg:20px;--radius-pill:999px;--shadow-float:0 10px 30px rgba(23,35,28,.16)}
+body{margin:0}
+.w2l{font-family:var(--font-body);font-size:16px;line-height:1.5;color:var(--color-text);background:var(--color-bg)}
+.w2l *,.w2l *::before,.w2l *::after{box-sizing:border-box}
+.w2l :is(h1,h2,h3,h4){font-family:var(--font-head);letter-spacing:-.02em;line-height:1.15;margin:0}
+.w2l p,.w2l ul,.w2l ol{margin:0}
+:where(.w2l) a{color:var(--color-primary)}
+.sprite{position:absolute;width:0;height:0;overflow:hidden}
+.icon{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.container{max-width:1200px;margin:0 auto;padding:0 24px}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 22px;border-radius:var(--radius-pill);border:1.5px solid transparent;font:600 15px/1 var(--font-body);text-decoration:none;cursor:pointer;white-space:nowrap;transition:background .15s,color .15s,border-color .15s}
+.btn:focus-visible,a:focus-visible,button:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid var(--color-text);outline-offset:2px}
+.btn--primary{background:var(--color-primary);color:#fff}.btn--primary:hover{background:var(--color-forest)}
+.btn--secondary{background:#fff;border-color:var(--color-primary);color:var(--color-primary)}.btn--secondary:hover{background:var(--color-primary-soft)}
+.btn--lg{min-height:52px;padding:0 28px;font-size:16px}
+.btn--block{width:100%}
+.badge{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:var(--radius-pill);font:600 12px/1.4 var(--font-body);white-space:nowrap}
+.badge::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.badge--in{background:var(--color-primary-soft);color:var(--color-primary)}.badge--in::before{background:var(--color-leaf)}
+.badge--out{background:var(--color-danger-bg);color:var(--color-danger)}
+.chip{display:inline-flex;align-items:center;padding:3px 12px;border-radius:var(--radius-pill);border:1px solid var(--color-border);background:#fff;font:500 13px/1.5 var(--font-body)}
+.price{font-family:var(--font-body);font-weight:700;color:var(--color-primary);font-variant-numeric:tabular-nums}
+.photo{display:grid;align-items:end;justify-items:start;padding:16px;border-radius:16px;background:repeating-linear-gradient(135deg,#dbeadf 0 14px,#d0e3d6 14px 28px);color:var(--color-muted-strong);font:500 13px/1.4 var(--font-body)}
+.stepper{display:inline-flex;align-items:center;border:1px solid #8a968e;border-radius:var(--radius-pill);background:#fff}
+.stepper__btn{width:44px;height:44px;display:grid;place-items:center;border:0;background:none;border-radius:50%;color:var(--color-primary);cursor:pointer}
+.stepper__btn:hover{background:var(--color-primary-soft)}
+.stepper__input{width:48px;height:44px;border:0;background:none;text-align:center;font:600 16px var(--font-body);color:var(--color-text)}
+.crumbs{padding:20px 0 12px;font-size:14px;color:var(--color-muted-strong)}
+.crumbs ol{list-style:none;padding:0;display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.crumbs a{color:var(--color-muted-strong)}
+.crumbs li+li::before{content:"›";margin-right:6px;color:var(--color-muted)}
+.hero{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(440px,100%),1fr));gap:40px;align-items:start;padding:8px 0 56px}
+.hero__media{aspect-ratio:4/3;border-radius:20px}
+.hero__title{font-size:clamp(30px,3.6vw,42px);font-weight:800}
+.hero__summary{margin-top:12px;font-size:18px;color:var(--color-muted-strong)}
+.hero__chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}
+.buybox{margin-top:24px;background:#fff;border:1px solid var(--color-border);border-radius:var(--radius-lg);padding:24px;display:flex;flex-direction:column;gap:16px}
+.buybox__row{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.buybox__label{font-size:14px;color:var(--color-muted-strong)}
+.buybox__price{font-size:36px;line-height:1.1}
+.buybox__qty{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.buybox__qty-label{font:600 14px var(--font-body)}
+.buybox__note{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:var(--radius-sm);background:var(--color-warn-bg);color:#5e3d00;font-size:13px}
+.buybox__note .icon{margin-top:1px}
+.block{padding:56px 0;border-top:1px solid var(--color-border)}
+.block__title{font-size:clamp(24px,2.8vw,30px);font-weight:800;margin-bottom:20px}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(400px,100%),1fr));gap:48px}
+.prose p{color:var(--color-muted-strong);line-height:1.75;max-width:62ch}
+.prose p+p{margin-top:14px}
+.learn{list-style:none;padding:0;display:flex;flex-direction:column;gap:14px}
+.learn li{display:flex;gap:12px;align-items:flex-start}
+.learn__tick{width:28px;height:28px;border-radius:50%;background:var(--color-primary-soft);color:var(--color-primary);display:grid;place-items:center;flex:none}
+.learn__tick .icon{width:16px;height:16px;stroke-width:2}
+.table-wrap{background:#fff;border:1px solid var(--color-border);border-radius:var(--radius-md);overflow-x:auto}
+.kit{width:100%;border-collapse:collapse;font-size:15px}
+.kit th{position:sticky;top:0;text-align:left;font:600 13px var(--font-body);color:var(--color-muted-strong);padding:12px 16px;background:#f2f4ee;border-bottom:1px solid var(--color-border)}
+.kit td{padding:12px 16px;border-bottom:1px solid #edefe9;vertical-align:middle}
+.kit tfoot td{border-bottom:0;background:#f7faf7;font-weight:700}
+.kit .num{text-align:right;font-variant-numeric:tabular-nums;font-family:var(--font-body)}
+.kit__thumb{width:48px;height:48px;border-radius:8px;border:1px solid #edefe9;background:#fff;display:grid;place-items:center;color:#9db8a6}
+.kit__thumb svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:1.2;stroke-linecap:round;stroke-linejoin:round}
+.kit__name{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.kit__name a{color:var(--color-text);font-weight:500}
+.kit__check{width:20px;height:20px;accent-color:var(--color-primary)}
+.kit__row--out td{background:#fff8f8}
+.kit__row--out .kit__name a{color:var(--color-muted-strong)}
+.kit-actions{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-top:16px}
+.kit-actions p{font-size:14px;color:var(--color-muted-strong);max-width:60ch}
+.steps{list-style:none;padding:0;display:flex;flex-direction:column;gap:14px;counter-reset:s}
+.gstep{background:#fff;border:1px solid var(--color-border);border-radius:var(--radius-md);overflow:hidden}
+.gstep summary{display:flex;align-items:center;gap:14px;min-height:64px;padding:12px 20px;cursor:pointer;list-style:none;font:700 18px var(--font-head)}
+.gstep summary::-webkit-details-marker{display:none}
+.gstep summary::after{content:"";margin-left:auto;width:10px;height:10px;border-right:2px solid var(--color-muted-strong);border-bottom:2px solid var(--color-muted-strong);transform:rotate(45deg);transition:transform .15s}
+.gstep[open] summary::after{transform:rotate(-135deg)}
+.gstep__num{width:34px;height:34px;border-radius:50%;background:var(--color-primary);color:#fff;display:grid;place-items:center;font:700 15px var(--font-body);flex:none}
+.gstep__body{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(280px,100%),1fr));gap:24px;padding:4px 20px 22px;align-items:start}
+.gstep__photo{aspect-ratio:3/2;border-radius:12px}
+.gstep__body p{color:var(--color-muted-strong);line-height:1.7}
+.safety{display:flex;gap:16px;padding:20px 24px;border-radius:var(--radius-md);background:var(--color-warn-bg);color:#4d3200}
+.safety .icon{width:26px;height:26px;margin-top:2px;color:var(--color-warn)}
+.safety h3{font-size:18px;margin-bottom:6px}
+.safety ul{padding-left:20px;display:flex;flex-direction:column;gap:6px}
+.downloads{list-style:none;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(280px,100%),1fr));gap:12px}
+.download{display:flex;align-items:center;gap:14px;min-height:64px;padding:12px 18px;background:#fff;border:1px solid var(--color-border);border-radius:var(--radius-md);text-decoration:none;color:var(--color-text)}
+.download:hover{border-color:var(--color-primary)}
+.download__icon{width:40px;height:40px;border-radius:10px;background:var(--color-primary-soft);color:var(--color-primary);display:grid;place-items:center;flex:none}
+.download__meta{font-size:13px;color:var(--color-muted-strong)}
+.download__name{font-weight:600}
+.related{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr));gap:20px}
+.project-card{display:flex;flex-direction:column;background:#fff;border:1px solid var(--color-border);border-radius:var(--radius-md);overflow:hidden}
+.project-card__media{aspect-ratio:4/3;border-radius:0}
+.project-card__body{display:flex;flex-direction:column;gap:8px;padding:16px;flex:1}
+.project-card__chips{display:flex;gap:8px;flex-wrap:wrap}
+.project-card__title{font-size:19px;font-weight:700}
+.project-card__title a{color:var(--color-text);text-decoration:none}.project-card__title a:hover{text-decoration:underline}
+.project-card__kit{margin-top:auto;font-size:13px;color:var(--color-muted-strong)}
+.sticky-bar{display:none}
+@media(max-width:760px){
+.container{padding:0 16px}.hero{gap:24px;padding-bottom:40px}.block{padding:40px 0}.two{gap:32px}
+.buybox{padding:18px}.buybox__price{font-size:30px}
+.kit thead{display:none}
+.kit,.kit tbody,.kit tfoot,.kit tr,.kit td{display:block}
+.kit tr{display:grid;grid-template-columns:auto 48px minmax(0,1fr);gap:4px 12px;padding:14px 16px;border-bottom:1px solid #edefe9;align-items:center}
+.kit td{padding:0;border:0;background:none !important}
+.kit td.kit__sel{grid-row:1 / span 2}
+.kit td.kit__img{grid-row:1 / span 2}
+.kit td.kit__item{grid-column:3}
+.kit td.kit__qty,.kit td.kit__unit,.kit td.kit__line{grid-column:3;display:inline}
+.kit td.num{text-align:left}
+.kit td[data-label]::before{content:attr(data-label) ": ";color:var(--color-muted-strong);font-size:13px;font-weight:500}
+.kit tfoot tr{display:flex;justify-content:space-between;background:#f7faf7}
+.kit tfoot td:empty{display:none}
+.sticky-bar{position:fixed;left:0;right:0;bottom:0;z-index:10;display:flex;align-items:center;gap:12px;padding:10px 16px;background:#fff;border-top:1px solid var(--color-border);box-shadow:0 -6px 20px rgba(23,35,28,.1)}
+.sticky-bar__label{font-size:12px;color:var(--color-muted-strong);line-height:1.2}
+.sticky-bar__price{font-size:20px;line-height:1.2}
+.sticky-bar .btn{flex:1}
+.end-space{height:76px}
+.gstep summary{font-size:16px;padding:10px 16px}
+.gstep__body{padding:4px 16px 18px}
+}
+:root{--color-bg:#f7f8f3;--color-text:#17231c;--color-muted:#66736b;--color-border:#d8dad5;--color-primary:#0c5c2e;--color-forest:#0c4a23;--color-primary-soft:#e7f4eb;--font-head:'Manrope',system-ui,sans-serif;--font-body:'Inter',system-ui,sans-serif}
+body{margin:0}
+.site-header{font-family:var(--font-body);color:var(--color-text);background:#fff;border-bottom:1px solid var(--color-border)}
+.site-header *,.site-header *::before,.site-header *::after{box-sizing:border-box}
+.site-header a{color:inherit}
+.site-header a:focus-visible,.site-header button:focus-visible,.site-header input:focus-visible{outline:2px solid var(--color-text);outline-offset:2px}
+.icon{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.skip-link{position:absolute;left:8px;top:-60px;background:var(--color-forest);color:#fff;padding:10px 16px;border-radius:8px;z-index:5;font:600 14px var(--font-body);text-decoration:none}
+.skip-link:focus{top:8px}
+.strip{background:var(--color-primary-soft);color:var(--color-forest);font-size:13px}
+.strip__in{position:relative;max-width:1200px;margin:0 auto;padding:0 56px;min-height:40px;display:flex;align-items:center;justify-content:center;text-align:center}
+.strip__close{position:absolute;right:6px;top:0;width:44px;height:40px;display:grid;place-items:center;border:0;background:none;color:var(--color-forest);cursor:pointer;border-radius:50%}
+.strip__close .icon{width:16px;height:16px}
+.bar{max-width:1200px;margin:0 auto;padding:0 24px;min-height:72px;display:flex;align-items:center;gap:20px}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.logo__mark{width:34px;height:34px;color:var(--color-primary)}
+.logo__word{font:800 20px/1 var(--font-head);letter-spacing:-.02em}
+.logo__word b{color:var(--color-primary);font-weight:800}
+.logo__tag{font:600 11px/1 var(--font-body);letter-spacing:.08em;text-transform:uppercase;background:var(--color-primary-soft);color:var(--color-primary);padding:5px 8px;border-radius:999px}
+.nav{display:flex;gap:2px;margin:0 auto}
+.nav__link{display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border-radius:999px;text-decoration:none;font:500 15px var(--font-body)}
+.nav__link:hover{background:var(--color-primary-soft)}
+.nav__link--active{background:var(--color-primary-soft);color:var(--color-primary);font-weight:600}
+.search{display:flex;align-items:center;gap:8px;width:250px;min-height:44px;padding:0 14px;background:var(--color-bg);border:1px solid var(--color-border);border-radius:999px;color:var(--color-muted)}
+.search:focus-within{border-color:var(--color-primary);background:#fff}
+.search input{flex:1;min-width:0;border:0;outline:0;background:none;font:400 15px var(--font-body);color:var(--color-text)}
+.search input:focus-visible{outline:0}
+.actions{display:flex;align-items:center;gap:2px}
+.icon-btn{position:relative;display:grid;place-items:center;width:44px;height:44px;border:0;background:none;border-radius:50%;color:var(--color-text);cursor:pointer;text-decoration:none}
+.icon-btn:hover{background:var(--color-primary-soft)}
+.icon-btn__badge{position:absolute;top:3px;right:1px;min-width:20px;height:20px;padding:0 5px;border-radius:10px;background:var(--color-primary);color:#fff;font:700 11px/20px var(--font-body);text-align:center}
+.icon-btn--phone{display:none}
+@media(max-width:1000px){.nav,.search,.icon-btn--account{display:none}.icon-btn--phone{display:grid}.bar{gap:4px;padding:0 12px 0 16px}.logo{margin-right:auto}}
+@media(max-width:480px){.logo__tag{display:none}.strip__in{padding:0 48px 0 16px;text-align:left;font-size:12.5px}}
+:root{--color-text:#17231c;--color-primary:#0c5c2e;--color-forest:#0c4a23;--color-leaf:#35a65a;--color-sun:#f6c453;--color-primary-soft:#e7f4eb;--font-head:'Manrope',system-ui,sans-serif;--font-body:'Inter',system-ui,sans-serif}
+body{margin:0}
+.site-footer{position:relative;font-family:var(--font-body);background:var(--color-forest);color:#fff;font-size:15px;line-height:1.6}
+.site-footer *,.site-footer *::before,.site-footer *::after{box-sizing:border-box}
+.site-footer a{color:#dcebe0;text-decoration:none;display:inline-flex;align-items:center;min-height:32px}
+.site-footer a:hover{color:#fff;text-decoration:underline}
+.site-footer a:focus-visible,.site-footer button:focus-visible{outline:2px solid var(--color-sun);outline-offset:2px}
+.icon{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.footer__in{max-width:1200px;margin:0 auto;padding:64px 24px 28px}
+.footer__top{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(200px,100%),1fr));gap:36px}
+.footer__brand{max-width:340px}
+.footer__word{font:800 22px/1 var(--font-head);letter-spacing:-.02em;color:#fff}
+.footer__word b{color:var(--color-sun)}
+.footer__about{margin-top:14px;color:#c9dccf;font-size:14px}
+.footer__heading{font:700 13px var(--font-body);letter-spacing:.08em;text-transform:uppercase;color:var(--color-sun);margin:0 0 12px}
+.footer__list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
+.footer__contact{font-style:normal;margin-top:40px;padding-top:28px;border-top:1px solid rgba(255,255,255,.18);display:grid;grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr));gap:12px 36px;font-size:14px;color:#dcebe0}
+.footer__contact-item{display:flex;gap:10px;align-items:flex-start}
+.footer__contact-item .icon{margin-top:3px;color:var(--color-sun)}
+.footer__pay{margin-top:28px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;color:#dcebe0;font-size:14px}
+.pay-mark{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border:1px solid rgba(255,255,255,.4);border-radius:999px;font:600 12px var(--font-body);color:#fff}
+.footer__bottom{margin-top:28px;padding-top:20px;border-top:1px solid rgba(255,255,255,.18);display:flex;justify-content:space-between;gap:12px 24px;flex-wrap:wrap;font-size:13px;color:#c9dccf}
+.footer__legal{display:flex;gap:20px;flex-wrap:wrap}
+.footer__legal a{min-height:44px}
+.wa-float{position:fixed;right:20px;bottom:20px;z-index:20;display:inline-flex;align-items:center;gap:10px;height:56px;min-width:56px;padding:0 16px;border-radius:999px;background:var(--color-primary);color:#fff !important;box-shadow:0 10px 30px rgba(23,35,28,.28);border:2px solid #fff}
+.wa-float:hover{background:#0a4a25;text-decoration:none !important}
+.wa-float .icon{width:26px;height:26px}
+.wa-float__label{display:none;font:600 14px var(--font-body)}
+.wa-float:hover .wa-float__label,.wa-float:focus-visible .wa-float__label{display:inline}
+@media(max-width:760px){.footer__in{padding:48px 16px 24px}.wa-float{bottom:84px;right:12px}}
+.component{position:relative;height:auto}
+#root,#root>.component{height:auto}
+</style>
+</head>
+<body>
+
+<div id="root"><div class="component"><div><div class="component"><div class="w2l"><svg class="sprite" aria-hidden="true" focusable="false"><defs><symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2.5V5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M18.7 5.3l-1.8 1.8M7.1 16.9l-1.8 1.8"></path></symbol><symbol id="i-board" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="1.5"></rect><path d="M9 3v3M12 3v3M15 3v3M9 18v3M12 18v3M15 18v3M3 9h3M3 12h3M3 15h3M18 9h3M18 12h3M18 15h3"></path></symbol><symbol id="i-battery" viewBox="0 0 24 24"><rect x="3" y="8" width="16" height="9" rx="2"></rect><path d="M21 11v3M7 11v3M11 11v3"></path></symbol><symbol id="i-wire" viewBox="0 0 24 24"><circle cx="3.5" cy="8" r="1"></circle><path d="M4.5 8h2c3.5 0 3.5 8 7 8h2.5"></path><circle cx="20.5" cy="16" r="1"></circle></symbol><symbol id="i-tools" viewBox="0 0 24 24"><path d="M14.5 5.5a4 4 0 0 0-4.8 5.2L3.5 17l3.5 3.5 6.3-6.2a4 4 0 0 0 5.2-4.8l-2.5 2.5-2.3-.5-.5-2.3z"></path></symbol><symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"></path></symbol><symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"></path></symbol><symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14"></path></symbol><symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 4l9 16H3z"></path><path d="M12 10v4M12 17.2v.01"></path></symbol><symbol id="i-file" viewBox="0 0 24 24"><path d="M7 3h7l4 4v14H7z"></path><path d="M14 3v4h4M10 12h5M10 16h5"></path></symbol><symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4v11M7 11l5 5 5-5M5 20h14"></path></symbol></defs></svg><div class="component"><header class="site-header"><a class="skip-link" href="#main">Skip to content</a><div class="strip"><div class="strip__in"><p>Delivery and pickup in Minna, Niger State. Free delivery on every order.</p><button class="strip__close" type="button" aria-label="Dismiss announcement"><svg class="icon" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button></div></div><div class="bar"><a class="logo" href="index.html" aria-label="Waste2Light Store, home"><svg class="logo__mark" viewBox="0 0 34 34" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="17" cy="15" r="9"></circle><path d="M13 27h8M14.5 30h5"></path><path d="M12 15c0-3 2-5 5-5 0 3-2 5-5 5zM17 15v6"></path></svg><span class="logo__word">Waste<b>2</b>Light</span><span class="logo__tag">Store</span></a><nav aria-label="Main"><div class="nav"><a class="nav__link" href="Shop.html">Shop</a><a class="nav__link nav__link--active" href="Projects.html" aria-current="page">Projects</a><a class="nav__link" href="index.html#schools">For schools</a><a class="nav__link" href="About.html">About</a><a class="nav__link" href="Contact.html">Contact</a></div></nav><form class="search" role="search"><svg class="icon" aria-hidden="true"><circle cx="11" cy="11" r="6.5"></circle><path d="M16 16l4.5 4.5"></path></svg><label class="sr-only" for="hdr-q">Search components</label><input id="hdr-q" type="search" placeholder="Search components"></form><div class="actions"><button class="icon-btn icon-btn--phone" type="button" aria-label="Search"><svg class="icon" aria-hidden="true"><circle cx="11" cy="11" r="6.5"></circle><path d="M16 16l4.5 4.5"></path></svg></button><a class="icon-btn icon-btn--account" href="AccountOrders.html" aria-label="Account"><svg class="icon" aria-hidden="true"><circle cx="12" cy="8" r="3.5"></circle><path d="M5 20c0-3.6 3.1-6 7-6s7 2.4 7 6"></path></svg></a><a class="icon-btn" href="Cart.html" aria-label="Cart, 3 items"><svg class="icon" aria-hidden="true"><path d="M3 4h2l2.4 11.2a1.5 1.5 0 0 0 1.5 1.2h7.7a1.5 1.5 0 0 0 1.5-1.1L20 8H6.2"></path><circle cx="9.5" cy="20" r="1"></circle><circle cx="17" cy="20" r="1"></circle></svg><span class="icon-btn__badge"><span class="sc-interp">3</span></span></a><a class="icon-btn icon-btn--phone" href="MenuM.html" aria-label="Open menu"><svg class="icon" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"></path></svg></a></div></div></header></div><main id="main"><div class="container"><nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="Projects.html">Projects</a></li><li aria-current="page">Solar phone charger</li></ol></nav><section class="hero" aria-labelledby="proj-title"><div class="hero__media photo" role="img" aria-label="Photo placeholder: the finished solar phone charger">Photo or short video (no autoplay) · finished charger charging a phone · 4:3</div><div><h1 class="hero__title" id="proj-title">Solar phone charger</h1><p class="hero__summary">Charge a phone from the sun. You build the whole thing in one afternoon and learn how solar power is stored and used.</p><div class="hero__chips"><span class="chip">Beginner</span><span class="chip">Secondary</span><span class="chip">2 hours to build</span></div><div class="buybox"><div class="buybox__row"><span class="buybox__label">Complete kit</span><span class="price buybox__price">₦25,800</span></div><div class="buybox__qty"><span class="buybox__qty-label" id="kits-label">Number of kits</span><div class="stepper" role="group" aria-labelledby="kits-label"><button class="stepper__btn" type="button" aria-label="Fewer kits"><svg class="icon" aria-hidden="true"><use href="#i-minus"></use></svg></button><input class="stepper__input" type="text" inputmode="numeric" aria-label="Number of kits" value="1"><button class="stepper__btn" type="button" aria-label="More kits"><svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg></button></div></div><div class="buybox__note" role="status"><svg class="icon" aria-hidden="true"><use href="#i-alert"></use></svg><p>One part in this kit is out of stock. Buy the kit anyway and we'll call you to agree a swap or a short wait.</p></div><a class="btn btn--primary btn--lg btn--block" href="Cart.html">Buy the kit</a><a class="btn btn--secondary btn--lg btn--block" href="Quote.html">Request a quote for a class</a></div></div></section><section class="block two" aria-label="About this project"><div class="prose"><h2 class="block__title">What you'll build</h2><p>A small solar charger that stores the sun's energy in two rechargeable cells and gives it back through a USB port, so you can top up a phone or a power bank.</p><p>You will wire the panel to a charging module, fit the cells, add a switch and a boost module, then test it in real sunlight.</p><p>Everything you need is in the kit. You only need a screwdriver and, if you want neat joints, a soldering iron.</p></div><div><h2 class="block__title">What you'll learn</h2><ul class="learn"><li><span class="learn__tick"><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg></span>How a solar panel turns sunlight into electricity</li><li><span class="learn__tick"><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg></span>How to charge and protect a Li-ion cell safely</li><li><span class="learn__tick"><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg></span>What voltage and current are, and how to measure them</li><li><span class="learn__tick"><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg></span>How to read a simple wiring diagram</li><li><span class="learn__tick"><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg></span>Why solar systems store energy in batteries</li></ul></div></section><section class="block" aria-labelledby="kit-title"><h2 class="block__title" id="kit-title">What's in the kit</h2><div class="table-wrap"><table class="kit"><caption class="sr-only">Components in the solar phone charger kit</caption><thead><tr><th scope="col"><span class="sr-only">Include</span></th><th scope="col"><span class="sr-only">Image</span></th><th scope="col">Component</th><th scope="col" class="num">Qty</th><th scope="col" class="num">Unit price</th><th scope="col" class="num">Line total</th></tr></thead><tbody><tr class="kit__row"><td class="kit__sel"><input class="kit__check" type="checkbox" aria-label="Include 6V 6W Mini Solar Panel" checked=""></td><td class="kit__img"><span class="kit__thumb"><svg aria-hidden="true"><use href="#i-sun"></use></svg></span></td><td class="kit__item"><span class="kit__name"><a href="Product.html"><span class="sc-interp">6V 6W Mini Solar Panel</span></a></span></td><td class="num kit__qty" data-label="Qty"><span class="sc-interp">1</span></td><td class="num kit__unit" data-label="Unit"><span class="sc-interp">₦9,800</span></td><td class="num kit__line" data-label="Total"><span class="sc-interp">₦9,800</span></td></tr><tr class="kit__row"><td class="kit__sel"><input class="kit__check" type="checkbox" aria-label="Include TP4056 Li-ion Charger Module, USB-C" checked=""></td><td class="kit__img"><span class="kit__thumb"><svg aria-hidden="true"><use href="#i-board"></use></svg></span></td><td class="kit__item"><span class="kit__name"><a href="Product.html"><span class="sc-interp">TP4056 Li-ion Charger Module, USB-C</span></a></span></td><td class="num kit__qty" data-label="Qty"><span class="sc-interp">1</span></td><td class="num kit__unit" data-label="Unit"><span class="sc-interp">₦1,500</span></td><td class="num kit__line" data-label="Total"><span class="sc-interp">₦1,500</span></td></tr><tr class="kit__row--out"><td class="kit__sel"><input class="kit__check" type="checkbox" disabled="" aria-label="Include 5V 2A USB Boost Module (Step-up)"></td><td class="kit__img"><span class="kit__thumb"><svg aria-hidden="true"><use href="#i-board"></use></svg></span></td><td class="kit__item"><span class="kit__name"><a href="Product.html"><span class="sc-interp">5V 2A USB Boost Module (Step-up)</span></a><span class="badge badge--out">Out of stock</span></span></td><td class="num kit__qty" data-label="Qty"><span class="sc-interp">1</span></td><td class="num kit__unit" data-label="Unit"><span class="sc-interp">₦2,400</span></td><td class="num kit__line" data-label="Total"><span class="sc-interp">₦2,400</span></td></tr><tr class="kit__row"><td class="kit__sel"><input class="kit__check" type="checkbox" aria-label="Include Dual 18650 Battery Holder" checked=""></td><td class="kit__img"><span class="kit__thumb"><svg aria-hidden="true"><use href="#i-battery"></use></svg></span></td><td class="kit__item"><span class="kit__name"><a href="Product.html"><span class="sc-interp">Dual 18650 Battery Holder</span></a></span></td><td class="num kit__qty" data-label="Qty"><span class="sc-interp">1</span></td><td class="num kit__unit" data-label="Unit"><span class="sc-interp">₦1,200</span></td><td class="num kit__line" data-label="Total"><span class="sc-interp">₦1,200</span></td></tr><tr class="kit__row"><td class="kit__sel"><input class="kit__check" type="checkbox" aria-label="Include 18650 Li-ion Cell 3.7V 2600mAh" checked=""></td><td class="kit__img"><span class="kit__thumb"><svg aria-hidden="true"><use href="#i-battery"></use></svg></span></td><td class="kit__item"><span class="kit__name"><a href="Product.html"><span class="sc-interp">18650 Li-ion Cell 3.7V 2600mAh</span></a></span></td><td class="num kit__qty" data-label="Qty"><span class="sc-interp">2</span></td><td class="num kit__unit" data-label="Unit"><span class="sc-interp">₦3,200</span></td><td class="num kit__line" data-label="Total"><span class="sc-interp">₦6,400</span></td></tr><tr class="kit__row"><td class="kit__sel"><input class="kit__check" type="checkbox" aria-label="Include Mini Toggle Switch" checked=""></td><td class="kit__img"><span class="kit__thumb"><svg aria-hidden="true"><use href="#i-tools"></use></svg></span></td><td class="kit__item"><span class="kit__name"><a href="Product.html"><span class="sc-interp">Mini Toggle Switch</span></a></span></td><td class="num kit__qty" data-label="Qty"><span class="sc-interp">1</span></td><td class="num kit__unit" data-label="Unit"><span class="sc-interp">₦700</span></td><td class="num kit__line" data-label="Total"><span class="sc-interp">₦700</span></td></tr><tr class="kit__row"><td class="kit__sel"><input class="kit__check" type="checkbox" aria-label="Include Jumper Wire Kit, 120 pcs" checked=""></td><td class="kit__img"><span class="kit__thumb"><svg aria-hidden="true"><use href="#i-wire"></use></svg></span></td><td class="kit__item"><span class="kit__name"><a href="Product.html"><span class="sc-interp">Jumper Wire Kit, 120 pcs</span></a></span></td><td class="num kit__qty" data-label="Qty"><span class="sc-interp">1</span></td><td class="num kit__unit" data-label="Unit"><span class="sc-interp">₦3,800</span></td><td class="num kit__line" data-label="Total"><span class="sc-interp">₦3,800</span></td></tr></tbody><tfoot><tr><td></td><td></td><td colspan="3">Kit total</td><td class="num"><span class="price">₦25,800</span></td></tr></tfoot></table></div><div class="kit-actions"><p>Want only some parts, for example because you already have a panel? Tick what you need and add just those.</p><button class="btn btn--secondary" type="button">Add selected items only</button></div></section><section class="block" aria-labelledby="guide-title"><h2 class="block__title" id="guide-title">Step-by-step guide</h2><ol class="steps"><li><details class="gstep" open=""><summary><span class="gstep__num">1</span>Test the solar panel</summary><div class="gstep__body"><div class="gstep__photo photo" role="img" aria-label="Photo placeholder">Photo · multimeter on the panel leads · 3:2</div><p>Put the panel in direct sunlight. Set a multimeter to DC volts and touch the probes to the red and black wires. You should read about 6V. If you read much less, tilt the panel towards the sun.</p></div></details></li><li><details class="gstep"><summary><span class="gstep__num">2</span>Fit the cells in the holder</summary><div class="gstep__body"><div class="gstep__photo photo" role="img" aria-label="Photo placeholder">Photo · two cells in the holder · 3:2</div><p>Look for the + and − marks on the holder. Push each 18650 cell in with the flat end on the spring. Never force a cell in the wrong way round.</p></div></details></li><li><details class="gstep"><summary><span class="gstep__num">3</span>Connect the charger module</summary><div class="gstep__body"><div class="gstep__photo photo" role="img" aria-label="Diagram placeholder">Diagram · wiring to the charger module · 3:2</div><p>Join the panel wires to the IN+ and IN− pads of the TP4056 module, and the battery holder to B+ and B−. Check every joint before moving on.</p></div></details></li><li><details class="gstep"><summary><span class="gstep__num">4</span>Add the switch and boost module</summary><div class="gstep__body"><div class="gstep__photo photo" role="img" aria-label="Photo placeholder">Photo · boost module and switch · 3:2</div><p>Wire the switch between the module output and the boost module input. The boost module turns the cell voltage into steady 5V for the USB port.</p></div></details></li><li><details class="gstep"><summary><span class="gstep__num">5</span>Test it and charge a phone</summary><div class="gstep__body"><div class="gstep__photo photo" role="img" aria-label="Photo placeholder">Photo · phone charging · 3:2</div><p>Leave the panel in the sun until the module's light turns blue. Switch on, plug in your phone and watch it charge.</p></div></details></li></ol></section><section class="block" aria-label="Safety notes"><div class="safety" role="note"><svg class="icon" aria-hidden="true"><use href="#i-alert"></use></svg><div><h3>Safety notes</h3><ul><li>Li-ion cells can get hot if their terminals touch or if they are put in backwards. Check polarity every time.</li><li>Charge cells only through the charger module.</li><li>Soldering irons are hot. Ask an adult to supervise.</li></ul></div></div></section><section class="block" aria-labelledby="dl-title"><h2 class="block__title" id="dl-title">Downloads</h2><ul class="downloads"><li><a class="download" href="Project.html"><span class="download__icon"><svg class="icon" aria-hidden="true"><use href="#i-file"></use></svg></span><span><span class="download__name">Wiring diagram</span><br><span class="download__meta">PDF · 1 page</span></span></a></li><li><a class="download" href="Project.html"><span class="download__icon"><svg class="icon" aria-hidden="true"><use href="#i-file"></use></svg></span><span><span class="download__name">Student worksheet</span><br><span class="download__meta">PDF · 2 pages</span></span></a></li><li><a class="download" href="Project.html"><span class="download__icon"><svg class="icon" aria-hidden="true"><use href="#i-download"></use></svg></span><span><span class="download__name">Teacher notes</span><br><span class="download__meta">PDF · 4 pages</span></span></a></li></ul></section><section class="block" aria-labelledby="rel-title"><h2 class="block__title" id="rel-title">Related projects</h2><div class="related"><article class="project-card"><div class="project-card__media photo" role="img" aria-label="Photo placeholder">Photo · 4:3</div><div class="project-card__body"><div class="project-card__chips"><span class="chip">Beginner</span><span class="chip">Primary and secondary</span></div><h3 class="project-card__title"><a href="Project.html">Bottle lantern</a></h3><p class="project-card__kit">Kit from <span class="price">₦10,500</span> · 5 components</p></div></article><article class="project-card"><div class="project-card__media photo" role="img" aria-label="Photo placeholder">Photo · 4:3</div><div class="project-card__body"><div class="project-card__chips"><span class="chip">Intermediate</span><span class="chip">Secondary and university</span></div><h3 class="project-card__title"><a href="Project.html">Mini wind turbine generator</a></h3><p class="project-card__kit">Kit from <span class="price">₦20,200</span> · 5 components</p></div></article><article class="project-card"><div class="project-card__media photo" role="img" aria-label="Photo placeholder">Photo · 4:3</div><div class="project-card__body"><div class="project-card__chips"><span class="chip">Intermediate</span><span class="chip">University</span></div><h3 class="project-card__title"><a href="Project.html">Weather station</a></h3><p class="project-card__kit">Kit from <span class="price">₦32,000</span> · 5 components</p></div></article></div></section></div><div class="end-space"></div></main><div class="sticky-bar"><div><p class="sticky-bar__label">Complete kit</p><p class="price sticky-bar__price">₦25,800</p></div><a class="btn btn--primary" href="Cart.html">Buy the kit</a></div><div class="component"><footer class="site-footer"><div class="footer__in"><div class="footer__top"><div class="footer__brand"><p class="footer__word">Waste<b>2</b>Light</p><p class="footer__about">The components and kits branch of Waste2Light Ltd. Power. Learn. Build.</p></div><nav aria-label="Shop categories"><h2 class="footer__heading">Shop</h2><ul class="footer__list"><li><a href="Shop.html">Microcontrollers and boards</a></li><li><a href="Shop.html">Sensors</a></li><li><a href="Shop.html">Solar and power</a></li><li><a href="Shop.html">Batteries and chargers</a></li><li><a href="Shop.html">Motors and drivers</a></li><li><a href="Shop.html">All components</a></li></ul></nav><nav aria-label="Projects"><h2 class="footer__heading">Projects</h2><ul class="footer__list"><li><a href="Project.html">Solar phone charger</a></li><li><a href="Projects.html">Bottle lantern</a></li><li><a href="Projects.html">Smart dustbin</a></li><li><a href="Projects.html">Mini wind turbine</a></li><li><a href="Quote.html">Request a quote</a></li></ul></nav><nav aria-label="Help"><h2 class="footer__heading">Help</h2><ul class="footer__list"><li><a href="Track.html">Track order</a></li><li><a href="Delivery.html">Delivery and pickup</a></li><li><a href="Delivery.html">Refund policy</a></li><li><a href="Contact.html">Contact</a></li></ul></nav><nav aria-label="Waste2Light"><h2 class="footer__heading">Waste2Light</h2><ul class="footer__list"><li><a href="About.html">About</a></li><li><a href="https://waste2light.com">waste2light.com</a></li><li><a href="https://waste2light.com/green-energy-corner">Green Energy Corner</a></li><li><a href="Contact.html">Partner with us</a></li></ul></nav></div><address class="footer__contact"><p class="footer__contact-item"><svg class="icon" aria-hidden="true"><path d="M12 21s7-6 7-11a7 7 0 0 0-14 0c0 5 7 11 7 11z"></path><circle cx="12" cy="10" r="2.5"></circle></svg><span>Waste2Light Ltd<br>Bosso, Minna, Niger State, Nigeria</span></p><p class="footer__contact-item"><svg class="icon" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="M3 7l9 6 9-6"></path></svg><span>info@waste2light.com</span></p><p class="footer__contact-item"><svg class="icon" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A15 15 0 0 1 3 6a2 2 0 0 1 2-2z"></path></svg><span>+234 813 439 2943<br>WhatsApp +234 807 878 7646</span></p><p class="footer__contact-item"><svg class="icon" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"></path></svg><span><a href="https://www.tiktok.com/@waste2light">TikTok @waste2light</a> · <a href="https://www.linkedin.com/company/waste2light">LinkedIn</a></span></p></address><div class="footer__pay"><span>Secure payments by Paystack</span><span class="pay-mark">Card</span><span class="pay-mark">Bank transfer</span><span class="pay-mark">USSD</span></div><div class="footer__bottom"><p>© Waste2Light Ltd. All rights reserved.</p><div class="footer__legal"><a href="Delivery.html">Terms</a><a href="Delivery.html">Privacy</a><a href="Delivery.html">Cookies</a></div></div></div><a class="wa-float" href="https://wa.me/2348078787646" aria-label="Chat with us on WhatsApp"><svg class="icon" aria-hidden="true"><path d="M4 20l1.4-4.2A8 8 0 1 1 8.3 18.7z"></path><path d="M9.2 9.2c.2 2.4 2.4 4.6 5 5.5l1-1.3-1.7-.9-.8.6c-.9-.4-1.7-1.2-2.1-2.1l.6-.8-.9-1.7z"></path></svg><span class="wa-float__label">Chat with us</span></a></footer></div></div></div></div></div></div>
+
+
+
+
+</body>
+</html>

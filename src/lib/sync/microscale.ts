@@ -1,4 +1,5 @@
 import type { SupplierAdapter } from "./adapters";
+import { sanitizeDescription } from "../sanitize";
 import { parsePrice, userAgent, type Fetcher, type Observation, type ShopProduct, type SupplierSearchHit } from "./types";
 
 export const MICROSCALE_ORIGIN = "https://www.microscale.net";
@@ -17,6 +18,7 @@ interface ShopifyProduct {
   handle?: string;
   title?: string;
   product_type?: string;
+  body_html?: string | null;
   images?: { src?: string }[];
   variants?: ShopifyVariant[];
 }
@@ -73,13 +75,19 @@ export function parseShopProducts(json: unknown, startPosition = 0): ShopProduct
   for (const p of products) {
     if (!p.handle || !Array.isArray(p.variants)) continue;
     const multi = p.variants.length > 1;
+    const description = sanitizeDescription(p.body_html);
+    const productImages = (p.images ?? []).map((i) => i.src).filter((s): s is string => !!s);
     for (const v of p.variants) {
+      const own = v.featured_image?.src || null;
+      const images = own ? [own, ...productImages.filter((s) => s !== own)] : productImages;
       out.push({
         ref: makeMicroscaleRef(p.handle, v.sku, v.id),
         handle: p.handle,
         title: multi && v.title && v.title !== "Default Title" ? `${p.title} (${v.title})` : String(p.title ?? p.handle),
         category: p.product_type?.trim() || "Other",
-        imageUrl: v.featured_image?.src || p.images?.[0]?.src || null,
+        imageUrl: images[0] ?? null,
+        images: images.slice(0, 8),
+        description,
         price: parsePrice(v.price),
         inStock: typeof v.available === "boolean" ? v.available : null,
         position: startPosition + out.length,

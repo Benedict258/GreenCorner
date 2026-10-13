@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Admin: Order W2L-ORD-1040</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Manrope:wght@500;700;800&amp;display=swap" rel="stylesheet" data-dc-tpl="1">
+<style>
+:root{--color-bg:#f7f8f3;--color-surface:#fff;--color-text:#17231c;--color-muted:#66736b;--color-muted-strong:#4a574f;--color-border:#d8dad5;--color-primary:#0c5c2e;--color-forest:#0c4a23;--color-leaf:#35a65a;--color-sun:#f6c453;--color-primary-soft:#e7f4eb;--color-warn:#8a5a00;--color-warn-bg:#fdf0d4;--color-danger:#a02222;--color-danger-bg:#fde5e5;--font-head:'Manrope',system-ui,sans-serif;--font-body:'Inter',system-ui,sans-serif;--radius-sm:8px;--radius-md:12px;--radius-lg:16px;--radius-pill:999px}
+body{margin:0}
+.admin{display:flex;min-height:100vh;background:#f1f4ee;font-family:var(--font-body);font-size:15px;line-height:1.5;color:var(--color-text)}
+.admin *,.admin *::before,.admin *::after{box-sizing:border-box}
+.admin :is(h1,h2,h3){font-family:var(--font-head);letter-spacing:-.02em;line-height:1.15;margin:0}
+.admin :is(p,ul,ol,dl,dd){margin:0}
+:where(.admin) a{color:var(--color-primary)}
+.admin a:focus-visible,.admin button:focus-visible,.admin textarea:focus-visible{outline:2px solid var(--color-text);outline-offset:2px}
+.sprite{position:absolute;width:0;height:0;overflow:hidden}
+.icon{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.admin__main{flex:1;min-width:0}
+.content{padding:24px 32px 72px;display:flex;flex-direction:column;gap:20px}
+.crumbs{font-size:14px;color:var(--color-muted-strong)}
+.crumbs a{color:var(--color-muted-strong)}
+.head{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.head__title{font-size:28px;font-weight:800;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.head__sub{margin-top:4px;color:var(--color-muted-strong)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 18px;border-radius:var(--radius-pill);border:1.5px solid transparent;font:600 14px/1 var(--font-body);text-decoration:none;cursor:pointer;white-space:nowrap}
+.btn--primary{background:var(--color-primary);color:#fff}.btn--primary:hover{background:var(--color-forest)}
+.btn--secondary{background:#fff;border-color:var(--color-primary);color:var(--color-primary)}.btn--secondary:hover{background:var(--color-primary-soft)}
+.btn--danger{background:#fff;border-color:var(--color-danger);color:var(--color-danger)}.btn--danger:hover{background:var(--color-danger-bg)}
+.btn--block{width:100%}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:var(--radius-pill);font:600 12px/1.4 var(--font-body);white-space:nowrap}
+.chip::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.s-sourcing{background:var(--color-warn-bg);color:var(--color-warn)}
+.s-ok{background:var(--color-primary-soft);color:var(--color-primary)}
+.s-bad{background:var(--color-danger-bg);color:var(--color-danger)}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:20px;align-items:start}
+.stack{display:flex;flex-direction:column;gap:20px;min-width:0}
+.panel{background:#fff;border:1px solid var(--color-border);border-radius:var(--radius-lg);overflow:hidden;min-width:0}
+.panel__head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:16px 20px;border-bottom:1px solid #edefe9}
+.panel__title{font-size:17px;font-weight:800}
+.panel__body{padding:16px 20px 20px;display:flex;flex-direction:column;gap:14px}
+.steps{list-style:none;padding:0;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px}
+.st{display:flex;flex-direction:column;gap:6px;padding-top:10px;border-top:4px solid var(--color-border);font-size:13px;color:var(--color-muted-strong)}
+.st b{font:700 13px var(--font-body);color:var(--color-text)}
+.st--done{border-top-color:var(--color-primary)}
+.st--now{border-top-color:var(--color-sun)}
+.st--now b{color:var(--color-warn)}
+.table-wrap{overflow-x:auto}
+.table{width:100%;min-width:900px;border-collapse:collapse;font-size:14px}
+.table th{text-align:left;font:600 12px var(--font-body);letter-spacing:.04em;text-transform:uppercase;color:var(--color-muted-strong);padding:12px 14px;background:#f2f4ee;border-bottom:1px solid var(--color-border);white-space:nowrap}
+.table td{padding:14px;border-bottom:1px solid #edefe9;vertical-align:top}
+.table .num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.table .name{font-weight:600}
+.table .sub{font-size:13px;color:var(--color-muted-strong)}
+.table tfoot td{border-bottom:0;font-weight:600;background:#fafbf8}
+.row--bad td{background:#fff8f8}
+.src{display:inline-flex;align-items:center;gap:6px;padding:2px 10px;border-radius:var(--radius-pill);font:600 12px var(--font-body);background:#eceee9;color:#33403a;white-space:nowrap}
+.src--ms{background:#e4ecf8;color:#1f4a86}
+.pos{color:var(--color-primary);font-weight:700}
+.sum{display:grid;gap:8px;padding:16px 20px;border-top:1px solid #edefe9;background:#fafbf8}
+.sum__row{display:flex;justify-content:space-between;gap:12px;font-size:14px}
+.sum__row dt{color:var(--color-muted-strong)}
+.sum__row dd{font-weight:600;font-variant-numeric:tabular-nums}
+.sum__row--big{padding-top:10px;border-top:1px solid var(--color-border);font-size:16px}
+.sum__row--big dd{font-size:20px}
+.internal{display:flex;gap:10px;padding:10px 14px;border-radius:var(--radius-sm);background:#e4ecf8;color:#173b6e;font-size:13px}
+.internal .icon{margin-top:1px}
+.contact-btns{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.contact-btns .btn{padding:0 8px;min-height:44px}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:14px}
+.kv dt{color:var(--color-muted-strong)}
+.kv dd{font-weight:600;word-break:break-word}
+.hist{list-style:none;padding:0;display:flex;flex-direction:column;gap:0}
+.hist li{position:relative;padding:0 0 16px 22px;font-size:14px}
+.hist li::before{content:"";position:absolute;left:4px;top:7px;width:9px;height:9px;border-radius:50%;background:var(--color-primary)}
+.hist li::after{content:"";position:absolute;left:8px;top:18px;bottom:-2px;width:1px;background:var(--color-border)}
+.hist li:last-child::after{display:none}
+.hist time{display:block;font-size:12px;color:var(--color-muted-strong)}
+textarea{width:100%;min-height:84px;padding:10px 12px;border:1px solid #8a968e;border-radius:var(--radius-sm);font:400 14px var(--font-body);color:var(--color-text);resize:vertical}
+.note{padding:10px 12px;border-radius:var(--radius-sm);background:#f2f4ee;font-size:14px}
+.note small{display:block;color:var(--color-muted-strong);font-size:12px;margin-top:2px}
+@media(max-width:1100px){.layout{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:900px){.admin{flex-direction:column}.content{padding:16px 16px 96px}.steps{grid-template-columns:repeat(2,minmax(0,1fr))}}
+:root{--color-text:#17231c;--color-primary:#0c5c2e;--color-forest:#0c4a23;--color-leaf:#35a65a;--color-sun:#f6c453;--color-primary-soft:#e7f4eb;--color-border:#d8dad5;--font-head:'Manrope',system-ui,sans-serif;--font-body:'Inter',system-ui,sans-serif}
+body{margin:0}
+.side{width:240px;min-height:100vh;display:flex;flex-direction:column;gap:20px;padding:20px 12px;background:var(--color-forest);color:#fff;font-family:var(--font-body)}
+.side *,.side *::before,.side *::after{box-sizing:border-box}
+.side :is(ul,p){margin:0}
+.side a:focus-visible,.side button:focus-visible,.tabbar a:focus-visible{outline:2px solid var(--color-sun);outline-offset:2px}
+.icon{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.sprite{position:absolute;width:0;height:0;overflow:hidden}
+.brand{display:flex;align-items:center;gap:10px;padding:4px 10px;text-decoration:none;color:#fff}
+.brand svg{width:30px;height:30px;color:var(--color-sun)}
+.brand__word{font:800 18px/1 var(--font-head);letter-spacing:-.02em}
+.brand__word b{color:var(--color-sun)}
+.brand__tag{display:block;margin-top:3px;font:600 10px var(--font-body);letter-spacing:.1em;text-transform:uppercase;color:#c9dccf}
+.nav{list-style:none;padding:0;display:flex;flex-direction:column;gap:2px}
+.nav__group{margin:14px 10px 4px;font:700 11px var(--font-body);letter-spacing:.1em;text-transform:uppercase;color:#a9c4b1}
+.nav__link{display:flex;align-items:center;gap:12px;min-height:44px;padding:0 12px;border-radius:10px;color:#e3efe6;text-decoration:none;font:500 14.5px var(--font-body)}
+.nav__link:hover{background:rgba(255,255,255,.1);color:#fff}
+.nav__link--on{background:#fff;color:var(--color-forest);font-weight:700}
+.nav__count{margin-left:auto;min-width:22px;height:22px;padding:0 7px;border-radius:11px;background:var(--color-sun);color:var(--color-text);font:700 12px/22px var(--font-body);text-align:center}
+.collapse{margin-top:auto;display:flex;align-items:center;gap:10px;min-height:44px;padding:0 12px;border:0;border-radius:10px;background:rgba(255,255,255,.08);color:#e3efe6;font:500 14px var(--font-body);cursor:pointer}
+.collapse:hover{background:rgba(255,255,255,.16)}
+.tabbar{display:none}
+@media(max-width:900px){
+.side{display:none}
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:30;display:grid;grid-template-columns:repeat(4,1fr);background:#fff;border-top:1px solid var(--color-border);box-shadow:0 -6px 20px rgba(23,35,28,.1);font-family:var(--font-body)}
+.tabbar a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:60px;color:#3d4942;text-decoration:none;font:600 12px var(--font-body);position:relative}
+.tabbar a[aria-current="page"]{color:var(--color-primary)}
+.tabbar a[aria-current="page"]::before{content:"";position:absolute;top:0;left:30%;right:30%;height:3px;border-radius:0 0 3px 3px;background:var(--color-primary)}
+.tabbar .icon{width:22px;height:22px}
+}
+:root{--color-bg:#f7f8f3;--color-text:#17231c;--color-muted-strong:#4a574f;--color-primary:#0c5c2e;--color-forest:#0c4a23;--color-sun:#f6c453;--color-primary-soft:#e7f4eb;--color-border:#d8dad5;--color-warn:#8a5a00;--color-warn-bg:#fdf0d4;--color-danger:#a02222;--color-danger-bg:#fde5e5;--font-head:'Manrope',system-ui,sans-serif;--font-body:'Inter',system-ui,sans-serif}
+body{margin:0}
+.top{position:relative;z-index:20;display:flex;align-items:center;gap:16px;min-height:72px;padding:0 24px;background:#fff;border-bottom:1px solid var(--color-border);font-family:var(--font-body);color:var(--color-text)}
+.top *,.top *::before,.top *::after{box-sizing:border-box}
+.top :is(ul,p){margin:0}
+.top a:focus-visible,.top button:focus-visible,.top input:focus-visible{outline:2px solid var(--color-text);outline-offset:2px}
+.icon{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.search{display:flex;align-items:center;gap:10px;flex:1;max-width:520px;min-height:44px;padding:0 16px;background:var(--color-bg);border:1px solid var(--color-border);border-radius:999px;color:var(--color-muted-strong)}
+.search:focus-within{background:#fff;border-color:var(--color-primary)}
+.search input{flex:1;min-width:0;border:0;outline:0;background:none;font:400 15px var(--font-body);color:var(--color-text)}
+.search kbd{font:600 11px var(--font-body);padding:2px 6px;border:1px solid var(--color-border);border-radius:6px;background:#fff}
+.right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.bell{position:relative}
+.bell__btn{position:relative;width:44px;height:44px;display:grid;place-items:center;border:0;background:none;border-radius:50%;cursor:pointer;color:var(--color-text)}
+.bell__btn:hover{background:var(--color-primary-soft)}
+.bell__count{position:absolute;top:3px;right:1px;min-width:20px;height:20px;padding:0 5px;border-radius:10px;background:var(--color-danger);color:#fff;font:700 11px/20px var(--font-body);text-align:center}
+.menu{position:absolute;right:0;top:calc(100% + 8px);width:380px;max-width:calc(100vw - 32px);background:#fff;border:1px solid var(--color-border);border-radius:16px;box-shadow:0 14px 40px rgba(23,35,28,.2);overflow:hidden}
+.menu__head{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid #edefe9}
+.menu__title{margin:0;font:800 16px var(--font-head)}
+.menu__mark{border:0;background:none;color:var(--color-primary);font:600 13px var(--font-body);cursor:pointer;min-height:44px;padding:0 6px;text-decoration:underline;text-underline-offset:3px}
+.note{list-style:none;padding:0;margin:0}
+.note li a{display:grid;grid-template-columns:12px minmax(0,1fr);gap:12px;padding:14px 18px;border-bottom:1px solid #edefe9;color:var(--color-text);text-decoration:none}
+.note li a:hover{background:#f7faf7}
+.note__dot{width:10px;height:10px;border-radius:50%;margin-top:6px;background:var(--color-primary)}
+.note__dot--read{background:transparent;border:1.5px solid #b9c2bb}
+.note__title{font:600 14px var(--font-body)}
+.note__text{font-size:13px;color:var(--color-muted-strong)}
+.note__time{font-size:12px;color:var(--color-muted-strong);margin-top:2px}
+.note__warn{color:var(--color-warn);font-weight:700}
+.menu__foot{display:block;padding:12px 18px;text-align:center;font:600 14px var(--font-body);color:var(--color-primary)}
+.user{display:flex;align-items:center;gap:10px;min-height:44px;padding:0 8px 0 4px;border:0;border-radius:999px;background:none;cursor:pointer;color:var(--color-text);font-family:var(--font-body)}
+.user:hover{background:var(--color-primary-soft)}
+.user__av{width:36px;height:36px;border-radius:50%;background:var(--color-forest);color:#fff;display:grid;place-items:center;font:700 13px var(--font-body)}
+.user__name{font:600 14px/1.2 var(--font-body);text-align:left}
+.user__role{display:block;font:500 12px var(--font-body);color:var(--color-muted-strong)}
+@media(max-width:760px){.top{padding:0 12px;gap:8px}.user__name{display:none}.search kbd{display:none}.menu{position:fixed;left:12px;right:12px;top:76px;width:auto;max-width:none}}
+.component{position:relative;height:auto}
+#root,#root>.component{height:auto}
+</style>
+</head>
+<body>
+
+<div id="root"><div class="component"><div class="admin"><svg class="sprite" aria-hidden="true" focusable="false"><defs><symbol id="i-phone" viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A15 15 0 0 1 3 6a2 2 0 0 1 2-2z"></path></symbol><symbol id="i-chat" viewBox="0 0 24 24"><path d="M4 20l1.4-4.2A8 8 0 1 1 8.3 18.7z"></path><path d="M9.2 9.2c.2 2.4 2.4 4.6 5 5.5l1-1.3-1.7-.9-.8.6c-.9-.4-1.7-1.2-2.1-2.1l.6-.8-.9-1.7z"></path></symbol><symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="M3 7l9 6 9-6"></path></symbol><symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"></rect><path d="M8 11V8a4 4 0 0 1 8 0v3"></path></symbol><symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"></path></symbol></defs></svg><div class="component"><div><svg class="sprite" aria-hidden="true" focusable="false"><defs><symbol id="a-dash" viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="1.5"></rect><rect x="13" y="4" width="7" height="7" rx="1.5"></rect><rect x="4" y="13" width="7" height="7" rx="1.5"></rect><rect x="13" y="13" width="7" height="7" rx="1.5"></rect></symbol><symbol id="a-orders" viewBox="0 0 24 24"><path d="M5 8h14l-1 12H6zM9 8V6a3 3 0 0 1 6 0v2"></path></symbol><symbol id="a-quotes" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"></path><path d="M8 9h8M8 12h5"></path></symbol><symbol id="a-quotation" viewBox="0 0 24 24"><path d="M7 3h7l4 4v14H7z"></path><path d="M14 3v4h4M10 12h5M10 16h5"></path></symbol><symbol id="a-products" viewBox="0 0 24 24"><path d="M3 7.5L12 3l9 4.5v9L12 21l-9-4.5z"></path><path d="M3 7.5l9 4.5 9-4.5M12 12v9"></path></symbol><symbol id="a-stock" viewBox="0 0 24 24"><path d="M12 3l9 5-9 5-9-5zM3 13l9 5 9-5"></path></symbol><symbol id="a-projects" viewBox="0 0 24 24"><path d="M3 7h6l2 2h10v10H3z"></path></symbol><symbol id="a-customers" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"></circle><path d="M3 19c0-3 2.7-5 6-5s6 2 6 5M16 5.5a3 3 0 0 1 0 5.5M18 14.5c1.8.6 3 2.2 3 4.5"></path></symbol><symbol id="a-sync" viewBox="0 0 24 24"><path d="M20 11a8 8 0 0 0-14-4M4 13a8 8 0 0 0 14 4M18 3v4h-4M6 21v-4h4"></path></symbol><symbol id="a-settings" viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"></path><circle cx="16" cy="7" r="2"></circle><circle cx="8" cy="17" r="2"></circle></symbol><symbol id="a-staff" viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"></path></symbol><symbol id="a-activity" viewBox="0 0 24 24"><path d="M3 12h4l3-7 4 14 3-7h4"></path></symbol><symbol id="a-more" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.2"></circle><circle cx="12" cy="12" r="1.2"></circle><circle cx="19" cy="12" r="1.2"></circle></symbol><symbol id="a-collapse" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6M20 4v16"></path></symbol></defs></svg><aside class="side" aria-label="Admin navigation"><a class="brand" href="AdminDashboard.html"><svg viewBox="0 0 34 34" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="17" cy="15" r="9"></circle><path d="M13 27h8M14.5 30h5"></path><path d="M12 15c0-3 2-5 5-5 0 3-2 5-5 5zM17 15v6"></path></svg><span><span class="brand__word">Waste<b>2</b>Light</span><span class="brand__tag">Admin</span></span></a><nav aria-label="Admin"><ul class="nav"><li><a class="nav__link" href="AdminDashboard.html"><svg class="icon" aria-hidden="true"><use href="#a-dash"></use></svg><span class="sc-interp">Dashboard</span></a></li><li><a class="nav__link nav__link--on" href="AdminOrders.html" aria-current="page"><svg class="icon" aria-hidden="true"><use href="#a-orders"></use></svg><span class="sc-interp">Orders</span><span class="nav__count"><span class="sc-interp">4</span></span></a></li><li><a class="nav__link" href="AdminQuote.html"><svg class="icon" aria-hidden="true"><use href="#a-quotes"></use></svg><span class="sc-interp">Quote requests</span><span class="nav__count"><span class="sc-interp">2</span></span></a></li><li><a class="nav__link" href="AdminQuote.html"><svg class="icon" aria-hidden="true"><use href="#a-quotation"></use></svg><span class="sc-interp">Quotations</span></a></li><li><a class="nav__link" href="AdminProducts.html"><svg class="icon" aria-hidden="true"><use href="#a-products"></use></svg><span class="sc-interp">Products</span></a></li><li><a class="nav__link" href="AdminProducts.html"><svg class="icon" aria-hidden="true"><use href="#a-stock"></use></svg><span class="sc-interp">Stock</span></a></li><li><a class="nav__link" href="AdminProjectEditor.html"><svg class="icon" aria-hidden="true"><use href="#a-projects"></use></svg><span class="sc-interp">Projects</span></a></li><li><a class="nav__link" href="AdminOrders.html"><svg class="icon" aria-hidden="true"><use href="#a-customers"></use></svg><span class="sc-interp">Customers</span></a></li><li><a class="nav__link" href="AdminDashboard.html"><svg class="icon" aria-hidden="true"><use href="#a-sync"></use></svg><span class="sc-interp">Sync</span></a></li><li><a class="nav__link" href="AdminDashboard.html"><svg class="icon" aria-hidden="true"><use href="#a-settings"></use></svg><span class="sc-interp">Settings</span></a></li><li><a class="nav__link" href="AdminDashboard.html"><svg class="icon" aria-hidden="true"><use href="#a-staff"></use></svg><span class="sc-interp">Staff</span></a></li><li><a class="nav__link" href="AdminDashboard.html"><svg class="icon" aria-hidden="true"><use href="#a-activity"></use></svg><span class="sc-interp">Activity</span></a></li></ul></nav><button class="collapse" type="button"><svg class="icon" aria-hidden="true"><use href="#a-collapse"></use></svg>Collapse menu</button></aside><nav class="tabbar" aria-label="Admin quick navigation"><a href="AdminDashboard.html"><svg class="icon" aria-hidden="true"><use href="#a-dash"></use></svg>Dashboard</a><a href="AdminOrders.html" aria-current="page"><svg class="icon" aria-hidden="true"><use href="#a-orders"></use></svg>Orders</a><a href="AdminQuote.html"><svg class="icon" aria-hidden="true"><use href="#a-quotes"></use></svg>Quotes</a><a href="AdminProducts.html"><svg class="icon" aria-hidden="true"><use href="#a-more"></use></svg>More</a></nav></div></div><div class="admin__main"><div class="component"><header class="top"><form class="search" role="search"><svg class="icon" aria-hidden="true"><circle cx="11" cy="11" r="6.5"></circle><path d="M16 16l4.5 4.5"></path></svg><label class="sr-only" for="adm-q">Search orders, customers and products</label><input id="adm-q" type="search" placeholder="Search orders, customers, products"><kbd>/</kbd></form><div class="right"><div class="bell"><button class="bell__btn" type="button" aria-label="Notifications, 3 unread" aria-expanded="false"><svg class="icon" aria-hidden="true"><path d="M6 17V11a6 6 0 0 1 12 0v6l1.5 2h-15zM10 21h4"></path></svg><span class="bell__count">3</span></button></div><button class="user" type="button" aria-label="Account menu, Ibrahim Danladi, Owner"><span class="user__av">ID</span><span class="user__name">Ibrahim Danladi<span class="user__role">Owner</span></span><svg class="icon" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg></button></div></header></div><main class="content" id="main"><nav class="crumbs" aria-label="Breadcrumb"><a href="AdminOrders.html">Orders</a> › W2L-ORD-1040</nav><div class="head"><div><h1 class="head__title">W2L-ORD-1040 <span class="chip s-sourcing">Sourcing</span> <span class="chip s-ok">Paid</span></h1><p class="head__sub">Placed 11 Oct 2026, 16:02 · Delivery in Minna</p></div><div><a class="btn btn--primary" href="AdminOrderDetail.html">Move to next status: Ready <svg class="icon" aria-hidden="true"><use href="#i-arrow"></use></svg></a></div></div><div class="layout"><div class="stack"><section class="panel" aria-label="Status"><div class="panel__body"><ol class="steps" aria-label="Order status"><li class="st st--done"><b>New</b>11 Oct, 16:02</li><li class="st st--done"><b>Confirmed</b>11 Oct, 16:30</li><li class="st st--now" aria-current="step"><b>Sourcing</b>12 Oct, 09:12</li><li class="st"><b>Ready</b>Next</li><li class="st"><b>Out for delivery</b>or Ready for pickup</li><li class="st"><b>Completed</b></li></ol></div></section><section class="panel" aria-labelledby="items-title"><div class="panel__head"><h2 class="panel__title" id="items-title">Items</h2><span class="chip s-bad">1 item unavailable</span></div><div class="internal"><svg class="icon" aria-hidden="true"><use href="#i-lock"></use></svg><span>Staff only. Source costs, markup and margin never appear on the public site.</span></div><div class="table-wrap"><table class="table"><caption class="sr-only">Order lines with our price, Microscale price, markup and margin</caption><thead><tr><th scope="col">Item</th><th scope="col">Source</th><th scope="col" class="num">Qty</th><th scope="col" class="num">Our price</th><th scope="col" class="num">Microscale price</th><th scope="col" class="num">Markup</th><th scope="col" class="num">Margin</th><th scope="col" class="num">Line total</th></tr></thead><tbody><tr><td><p class="name">HC-SR04 Ultrasonic Distance Sensor</p></td><td><span class="src src--ms">Microscale</span></td><td class="num">2</td><td class="num">₦2,200</td><td class="num">₦2,000</td><td class="num">10.0%</td><td class="num pos">₦400</td><td class="num">₦4,400</td></tr><tr><td><p class="name">SG90 Micro Servo Motor 9g</p></td><td><span class="src src--ms">Microscale</span></td><td class="num">3</td><td class="num">₦2,800</td><td class="num">₦2,550</td><td class="num">9.8%</td><td class="num pos">₦750</td><td class="num">₦8,400</td></tr><tr class="row--bad"><td><p class="name">DHT22 Temperature and Humidity Sensor</p><p class="sub"><span class="chip s-bad">Unavailable at Microscale</span></p><button class="btn btn--danger" type="button">Mark unavailable and refund item</button></td><td><span class="src src--ms">Microscale</span></td><td class="num">1</td><td class="num">₦4,800</td><td class="num">₦4,350</td><td class="num">10.3%</td><td class="num">₦450</td><td class="num">₦4,800</td></tr><tr><td><p class="name">Jumper Wire Kit, 120 pcs</p></td><td><span class="src">Our stock</span></td><td class="num">1</td><td class="num">₦3,800</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num">₦3,800</td></tr></tbody></table></div><dl class="sum"><div class="sum__row"><dt>Order total (paid)</dt><dd>₦21,400</dd></div><div class="sum__row"><dt>Cost of available Microscale lines</dt><dd>₦11,650</dd></div><div class="sum__row"><dt>Margin on those lines</dt><dd class="pos">₦1,150 (9.9%)</dd></div><div class="sum__row"><dt>Refund pending for unavailable item</dt><dd>₦4,800</dd></div><div class="sum__row sum__row--big"><dt>Customer keeps paying for</dt><dd>₦16,600</dd></div></dl></section><section class="panel" aria-labelledby="hist-title"><div class="panel__head"><h2 class="panel__title" id="hist-title">History</h2></div><div class="panel__body"><ol class="hist"><li><b>Moved to Sourcing</b> by Maryam Abubakar<time datetime="2026-10-12T09:12">12 Oct, 09:12</time></li><li><b>Confirmed</b> by Ibrahim Danladi after a call with the customer<time datetime="2026-10-11T16:30">11 Oct, 16:30</time></li><li><b>Payment received</b> through Paystack<time datetime="2026-10-11T16:02">11 Oct, 16:02</time></li><li><b>Order placed</b> on the website<time datetime="2026-10-11T16:01">11 Oct, 16:01</time></li></ol></div></section></div><aside class="stack" aria-label="Customer and payment"><section class="panel" aria-labelledby="cust-title"><div class="panel__head"><h2 class="panel__title" id="cust-title">Customer</h2></div><div class="panel__body"><dl class="kv"><dt>Name</dt><dd>Ngozi Eze</dd><dt>Phone</dt><dd>+234 809 555 0191</dd><dt>Email</dt><dd>ngozi.eze@example.com</dd></dl><div class="contact-btns"><a class="btn btn--primary" href="tel:+2348095550191"><svg class="icon" aria-hidden="true"><use href="#i-phone"></use></svg>Call</a><a class="btn btn--secondary" href="https://wa.me/2348095550191"><svg class="icon" aria-hidden="true"><use href="#i-chat"></use></svg>WhatsApp</a><a class="btn btn--secondary" href="mailto:ngozi.eze@example.com"><svg class="icon" aria-hidden="true"><use href="#i-mail"></use></svg>Email</a></div></div></section><section class="panel" aria-labelledby="del-title"><div class="panel__head"><h2 class="panel__title" id="del-title">Delivery</h2></div><div class="panel__body"><p>Delivery in Minna<br>7 Maitumbi Road, Maitumbi<br>Near Maitumbi roundabout</p><p class="note">Customer asked for delivery after 4pm.<small>Note by Ibrahim Danladi, 11 Oct</small></p></div></section><section class="panel" aria-labelledby="pay-title"><div class="panel__head"><h2 class="panel__title" id="pay-title">Payment</h2><span class="chip s-ok">Paid</span></div><div class="panel__body"><dl class="kv"><dt>Provider</dt><dd>Paystack</dd><dt>Reference</dt><dd>w2l_1040_8f3a21</dd><dt>Amount</dt><dd>₦21,400</dd><dt>Paid</dt><dd>11 Oct, 16:02</dd><dt>Method</dt><dd>Card</dd></dl></div></section><section class="panel" aria-labelledby="notes-title"><div class="panel__head"><h2 class="panel__title" id="notes-title">Add a note</h2></div><div class="panel__body"><label class="sr-only" for="newnote">Internal note</label><textarea id="newnote" placeholder="Only staff can see notes"></textarea><button class="btn btn--secondary btn--block" type="button">Save note</button></div></section></aside></div></main></div></div></div></div>
+
+
+
+
+</body>
+</html>

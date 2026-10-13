@@ -14,7 +14,8 @@ export function getPool(): Pool {
     if (!url) throw new Error("DATABASE_URL is not set");
     pool = new Pool({
       connectionString: url,
-      max: 5,
+      // PG_POOL_MAX=1 for local test servers that cannot run queries in parallel (PGlite).
+      max: Number(process.env.PG_POOL_MAX) || 5,
       ssl: /sslmode=require|neon\.tech|supabase\./.test(url) ? { rejectUnauthorized: false } : undefined,
     });
   }

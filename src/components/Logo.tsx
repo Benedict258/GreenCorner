@@ -9,6 +9,15 @@ export const LOGO_PATHS = [
   "M5630 1460 c-24 -24 -25 -59 -4 -131 48 -164 189 -292 382 -345 36 -10 115 -18 215 -21 182 -6 254 6 375 63 150 72 270 227 280 363 7 97 52 91 -635 91 -580 0 -593 0 -613 -20z",
 ];
 
+/** The mark alone, in the current text colour. */
+export function LogoMark({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 1254 1254" aria-hidden="true" fill="currentColor">
+      <g transform="translate(0,1254) scale(0.1,-0.1)">{LOGO_PATHS.map((d, i) => <path key={i} d={d} />)}</g>
+    </svg>
+  );
+}
+
 export function Logo({ suffix }: { suffix?: string }) {
   return (
     <span className="logo">

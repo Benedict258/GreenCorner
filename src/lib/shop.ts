@@ -1,3 +1,4 @@
+import type { PoolClient } from "pg";
 import { query, queryOne, tx } from "./db";
 import { unitPrice, type Supplier } from "./pricing";
 import { MICROSCALE_ORIGIN, splitMicroscaleRef } from "./sync/microscale";
@@ -99,26 +100,7 @@ export async function addToCart(ref: string, quantity: number): Promise<{ compon
   const qty = Math.floor(Number(quantity));
   if (!Number.isFinite(qty) || qty < 1 || qty > MAX_QTY) throw new Error("Quantity must be a whole number of at least 1.");
   return tx(async (c) => {
-    const p = (await c.query("select * from supplier_products where supplier = $1 and ref = $2", [SUPPLIER, ref])).rows[0];
-    if (!p) throw new Error("That product is no longer in the Microscale catalog. Refresh the page.");
-    const linked = (await c.query("select component_id from supplier_listings where supplier = $1 and supplier_ref = $2 order by id limit 1", [SUPPLIER, ref])).rows[0];
-    let componentId: number;
-    let name: string;
-    if (linked) {
-      componentId = linked.component_id;
-      // Picking it in the Shop means it is wanted again, even if it was deactivated in the Catalog.
-      name = (await c.query("update components set active = true where id = $1 returning name", [componentId])).rows[0].name;
-    } else {
-      name = String(p.title).slice(0, 200);
-      componentId = (await c.query("insert into components (name, category) values ($1, $2) returning id", [name, p.category])).rows[0].id;
-      const priced = p.price_ngn !== null;
-      const listing = (await c.query(
-        `insert into supplier_listings (component_id, supplier, supplier_ref, title, price_ngn, in_stock, status, last_synced_at, last_changed_at)
-         values ($1, $2, $3, $4, $5, $6, $7, $8, $9) returning id`,
-        [componentId, SUPPLIER, ref, p.title, p.price_ngn, p.in_stock ?? true, priced ? "ok" : "pending", priced ? p.seen_at : null, priced ? p.seen_at : null],
-      )).rows[0];
-      if (priced) await c.query("insert into price_history (listing_id, price_ngn, in_stock) values ($1, $2, $3)", [listing.id, p.price_ngn, p.in_stock ?? true]);
-    }
+    const { componentId, name } = await ensureComponent(c, ref);
     await c.query(
       `insert into cart_items (component_id, quantity) values ($1, $2)
        on conflict (component_id) do update set quantity = least(cart_items.quantity + excluded.quantity, ${MAX_QTY})`,
@@ -126,6 +108,35 @@ export async function addToCart(ref: string, quantity: number): Promise<{ compon
     );
     return { componentId, name };
   });
+}
+
+/**
+ * The Catalog component for a feed product. The first time a product is used it becomes a component with a
+ * Microscale listing priced from the feed (the same price a first sync would accept).
+ */
+export async function ensureComponent(c: PoolClient, ref: string): Promise<{ componentId: number; name: string }> {
+  const p = (await c.query("select * from supplier_products where supplier = $1 and ref = $2", [SUPPLIER, ref])).rows[0];
+  if (!p) throw new Error("That product is no longer in the Microscale catalog. Refresh the page.");
+  const linked = (await c.query("select component_id from supplier_listings where supplier = $1 and supplier_ref = $2 order by id limit 1", [SUPPLIER, ref])).rows[0];
+  if (linked) {
+    // Picking it means it is wanted again, even if it was deactivated in the Catalog.
+    const name = (await c.query("update components set active = true where id = $1 returning name", [linked.component_id])).rows[0].name;
+    return { componentId: linked.component_id, name };
+  }
+  const name = String(p.title).slice(0, 200);
+  const settings = (await c.query("select markup_pct from product_settings where supplier = $1 and ref = $2", [SUPPLIER, ref])).rows[0];
+  const componentId = (await c.query(
+    "insert into components (name, category, markup_pct) values ($1, $2, coalesce($3, (select value::numeric from settings where key = 'default_markup_pct'), 10)) returning id",
+    [name, p.category, settings?.markup_pct ?? null],
+  )).rows[0].id;
+  const priced = p.price_ngn !== null;
+  const listing = (await c.query(
+    `insert into supplier_listings (component_id, supplier, supplier_ref, title, price_ngn, in_stock, status, last_synced_at, last_changed_at)
+     values ($1, $2, $3, $4, $5, $6, $7, $8, $9) returning id`,
+    [componentId, SUPPLIER, ref, p.title, p.price_ngn, p.in_stock ?? true, priced ? "ok" : "pending", priced ? p.seen_at : null, priced ? p.seen_at : null],
+  )).rows[0];
+  if (priced) await c.query("insert into price_history (listing_id, price_ngn, in_stock) values ($1, $2, $3)", [listing.id, p.price_ngn, p.in_stock ?? true]);
+  return { componentId, name };
 }
 
 export interface CartLine {

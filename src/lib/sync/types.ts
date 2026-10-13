@@ -15,6 +15,8 @@ export interface ShopProduct {
   title: string;
   category: string;
   imageUrl: string | null;
+  images: string[]; // every product image, the variant's own first
+  description: string; // sanitized HTML, safe to show on our pages
   price: number | null;
   inStock: boolean | null;
   position: number; // order in the supplier's feed
